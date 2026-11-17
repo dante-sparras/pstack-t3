@@ -7,7 +7,10 @@ from __future__ import annotations
 
 import errno
 import os
+import shlex
+import shutil
 import stat
+import subprocess
 import time
 from contextlib import contextmanager
 from pathlib import Path
@@ -62,6 +65,30 @@ def make_link(target, path):
         _winapi.CreateJunction(str(target), str(path))
     else:
         os.symlink(target, path, target_is_directory=True)
+
+
+def move(path, target):
+    """Move the entry at `path` to `target`, as shutil.move does, except that a junction moves as a junction.
+
+    shutil.move does not see a junction as a link, so across volumes it would copy the directory the junction names.
+    """
+    if not is_junction(path):
+        shutil.move(path, target)
+        return
+    try:
+        os.rename(path, target)
+    except OSError as error:
+        if error.errno != errno.EXDEV:
+            raise
+        make_link(read_link(path), target)
+        os.unlink(path)
+
+
+def command_line(words):
+    """One command line a person can paste into this platform's usual shell."""
+    if WINDOWS:
+        return subprocess.list2cmdline(["python" if word == "python3" else word for word in words])
+    return shlex.join(words)
 
 
 def same_path(one, other):

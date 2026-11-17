@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import shutil
 import sys
 import time
 from contextlib import ExitStack
@@ -33,7 +32,7 @@ def act(step, root):
         os.makedirs(os.path.dirname(step.path), exist_ok=True)
         system.make_link(layout.link_target(root, step.path), step.path)
     elif step.kind == "move":
-        shutil.move(step.path, step.backup)
+        system.move(step.path, step.backup)
     elif step.kind == "unlink":
         return moves.remove_link(step.path, root, step.path, "link")
     elif step.kind == "withdraw":

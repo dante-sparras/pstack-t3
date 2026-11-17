@@ -52,15 +52,15 @@ def main():
     root = Path(tempfile.mkdtemp(prefix="pstack-install-smoke-"))
     try:
         home = root / "home"
-        old_home = os.environ.get("HOME")
+        saved = dict(os.environ)
+        for name in ("XDG_CONFIG_HOME", "CLAUDE_CONFIG_DIR"):
+            os.environ.pop(name, None)
         os.environ["HOME"] = str(home)
         try:
             directories = install.skill_dirs(None, True)
         finally:
-            if old_home is None:
-                del os.environ["HOME"]
-            else:
-                os.environ["HOME"] = old_home
+            os.environ.clear()
+            os.environ.update(saved)
         taken = directories["cursor"] / names[0]
         taken.mkdir(parents=True)
         (taken / "SKILL.md").write_text(FOREIGN, encoding="utf-8")
