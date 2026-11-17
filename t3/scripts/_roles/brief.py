@@ -72,10 +72,15 @@ def playbook_stem(value):
     return stem
 
 
+# poteto-mode puts the pointer to its worker.md on a brief's first line, above the persona.
+WORKER_LINE = re.compile(r"\s*Read [^\n]*worker\.md before anything else\.[ \t]*(?:\n|$)")
+
+
 def brief_problems(text, persona_body, playbooks):
     problems = []
     collapsed_body = " ".join(persona_body.split())
-    collapsed_brief = " ".join(text.split())
+    worker_line = WORKER_LINE.match(text)
+    collapsed_brief = " ".join(text[worker_line.end() if worker_line else 0:].split())
     if not collapsed_brief.startswith(collapsed_body):
         problems.append(
             f"missing persona: open the brief with the body of {persona_path()}, without its frontmatter"
