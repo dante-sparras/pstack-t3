@@ -76,7 +76,7 @@ flowchart LR
     build --> check["scripts/check.py<br/>no Cursor leftovers,<br/>valid frontmatter, links"]
     check --> skills["skills/<br/>what gets installed"]
     skills --> install["scripts/install.py"]
-    install --> dirs["~/.claude/skills  ~/.agents/skills<br/>~/.grok/skills  ~/.cursor/skills"]
+    install --> dirs["~/.claude/skills  ~/.agents/skills<br/>~/.grok/skills  ~/.cursor/skills<br/>~/.config/opencode/skills"]
 ```
 
 - `vendor/pstack` stays byte-identical to the upstream commit in [`upstream.json`](../upstream.json).

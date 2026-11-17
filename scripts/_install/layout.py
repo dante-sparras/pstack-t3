@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 SKILLS = ROOT / "skills"
 
-HARNESSES = ("claude", "codex", "grok", "cursor")
+HARNESSES = ("claude", "codex", "grok", "cursor", "opencode")
 
 LEGACY_NAME = "install-manifest.json"
 
@@ -35,11 +35,13 @@ def skill_dirs(scope_root, user):
     home = Path(os.environ.get("HOME", str(Path.home())))
     claude = Path(os.environ["CLAUDE_CONFIG_DIR"]) if user and os.environ.get("CLAUDE_CONFIG_DIR") else (home / ".claude" if user else scope_root / ".claude")
     base = home if user else scope_root
+    opencode = config_home(os.environ, lambda: home / ".config")[0] / "opencode" if user else scope_root / ".opencode"
     return {
         "claude": claude / "skills",
         "codex": base / ".agents" / "skills",
         "grok": base / ".grok" / "skills",
         "cursor": base / ".cursor" / "skills",
+        "opencode": opencode / "skills",
     }
 
 def extra_dirs(scope_root, user):
@@ -52,6 +54,8 @@ def extra_dirs(scope_root, user):
         "codex": [base / ".codex" / "skills"],
         "grok": [],
         "cursor": [base / ".agents" / "skills", base / ".codex" / "skills", claude],
+        # OpenCode also reads .claude/skills and .agents/skills, but its own directory takes precedence over both.
+        "opencode": [],
     }
 
 def state_dir(scope_root, user):
