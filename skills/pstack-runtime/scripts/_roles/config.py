@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-from _roles.base import BUDGETS, INHERIT, MODES, ModeSettingsError, PANEL_BACKUP_ROLE, Parent, ROLES, RolesError, SINGLE_ROLES
+from _roles.base import BUDGETS, INHERIT, MODES, ModeSettingsError, PANEL_BACKUP_ROLE, Parent, RETIRED_ROLES, ROLES, RolesError, SINGLE_ROLES
 from _roles import seam
 
 
@@ -84,7 +84,8 @@ def parse_exclude(value, origin):
 
     Every entry is an object with a non-empty "model", a non-empty "options", a
     non-empty "provider", a non-empty "roles" list, or a combination of them. A
-    string entry is refused.
+    string entry is refused. A retired role leaves its roles list, and an entry
+    whose roles were all retired is dropped.
     """
     if not isinstance(value, list):
         raise RolesError(f"{origin}: exclude must be a list")
@@ -119,9 +120,9 @@ def parse_exclude(value, origin):
             for name in names:
                 if not isinstance(name, str) or not name:
                     raise RolesError(f"{origin}: exclude entry roles must be a non-empty list of role names")
-                if name not in ROLES:
+                if name not in ROLES and name not in RETIRED_ROLES:
                     raise RolesError(f"{origin}: exclude entry roles names unknown role {name!r}")
-            rule["roles"] = list(names)
+            rule["roles"] = [name for name in names if name not in RETIRED_ROLES]
         if "options" in entry:
             options = entry["options"]
             if not isinstance(options, dict) or not options:
@@ -130,6 +131,8 @@ def parse_exclude(value, origin):
                 if not isinstance(option, (bool, str)):
                     raise RolesError(f"{origin}: exclude option {key!r} must be true, false, or a string")
             rule["options"] = dict(options)
+        if rule.get("roles") == []:
+            continue
         rules.append(rule)
     return tuple(rules)
 
@@ -138,12 +141,15 @@ def parse_backups(value, origin):
     """Validate the backups object and return role name -> tuple of seats.
 
     A seat is an object with a non-empty string "providerInstanceId" and "model".
-    Its "options", when present, is an object of bool or string values.
+    Its "options", when present, is an object of bool or string values. A retired
+    role's backups are dropped.
     """
     if not isinstance(value, dict):
         raise RolesError(f"{origin}: backups must be an object")
     backups = {}
     for name, seats in value.items():
+        if name in RETIRED_ROLES:
+            continue
         if name not in ROLES:
             raise RolesError(f"{origin}: backups names unknown role {name!r}")
         if not isinstance(seats, list) or not seats:
@@ -329,6 +335,8 @@ def check_shape(config, origin):
     roles = config.get("roles", {})
     if not isinstance(roles, dict):
         raise RolesError(f"{origin}: roles must be an object")
+    if "roles" in config:
+        roles = config["roles"] = {name: seats for name, seats in roles.items() if name not in RETIRED_ROLES}
     for name, seats in roles.items():
         if name not in ROLES:
             raise RolesError(f"{origin}: unknown role {name!r}")

@@ -32,7 +32,7 @@ A brief `Mode:` line is the frozen decision. A child copies that line bare value
 
 A parent writes `Mode: <effective mode>` into every brief whose child resolves seats or spawns. That covers brigade workers, code delegates, Autopilot and Orchestrate owners, sub-coordinators, unit workers, visual-parity owners, and landing writers. Read-only leaves such as a `how` explainer get no line because they resolve nothing.
 
-A session in light mode passes `--session-mode light` to every `roles.py` call with no brief value, except an explicit reflect, which passes `--session-mode full`. It writes `Mode: light` into its children briefs.
+A session in light mode passes `--session-mode light` to every `roles.py` call with no brief value. It writes `Mode: light` into its children briefs.
 
 The brief has to carry the decision because a child can miss the project file. `.gitignore` lists `/.pstack/`. A new worktree has no `.pstack/t3-roles.json`. `project_config_path` in `t3/scripts/roles.py` stops at the worktree `.git` file. A worker that ran `show --cwd` in its worktree would read only the user file. For the same reason `roles.py mode` runs with `--cwd` set to the project root, where the project `escalate` list lives.
 
