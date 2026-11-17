@@ -1,6 +1,6 @@
 import dataclasses
+import getpass
 import os
-import pwd
 import re
 import socket
 from pathlib import Path
@@ -112,6 +112,10 @@ def machine_value_findings(ops_dir, operations_doc, identity):
     return findings
 
 def _machine_identity():
-    """Identity(pwd.getpwuid(os.getuid()).pw_dir, pw_name, socket.gethostname())."""
+    """Identity(pwd.getpwuid(os.getuid()).pw_dir, pw_name, socket.gethostname()), or the home and login name on Windows, which has no pwd."""
+    if os.name == "nt":
+        return Identity(str(Path.home()), getpass.getuser(), socket.gethostname())
+    import pwd
+
     entry = pwd.getpwuid(os.getuid())
     return Identity(entry.pw_dir, entry.pw_name, socket.gethostname())
