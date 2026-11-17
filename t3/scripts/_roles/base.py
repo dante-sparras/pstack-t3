@@ -11,13 +11,6 @@ SINGLE_ROLES = [
     "perf-issue",
     "hillclimb",
     "judgment and prose",
-    "hardest tasks",
-    "how explorer",
-    "how explainer",
-    "why investigators",
-    "why synthesizer",
-    "reflect tooling",
-    "reflect judgment, divergent, synthesizer",
     "swarm workers",
     "skill tests",
 ]
@@ -26,7 +19,6 @@ SINGLE_ROLES = [
 PANEL_ROLES = [
     "arena runners",
     "arena cross-judge pool",
-    "architect runners",
     "interrogate reviewers",
     "verifiers",
     "review backups",
@@ -34,6 +26,19 @@ PANEL_ROLES = [
 
 
 ROLES = SINGLE_ROLES + PANEL_ROLES
+
+
+# A roles file written before these roles were retired still names them. Loading drops them, and the next write leaves them out.
+RETIRED_ROLES = frozenset({
+    "hardest tasks",
+    "how explorer",
+    "how explainer",
+    "why investigators",
+    "why synthesizer",
+    "reflect tooling",
+    "reflect judgment, divergent, synthesizer",
+    "architect runners",
+})
 
 
 BUDGETS = {"default": None, "small": "medium", "medium": "high", "large": "xhigh", "unlimited": "max"}
@@ -167,6 +172,7 @@ __all__ = [
     "SINGLE_ROLES",
     "PANEL_ROLES",
     "ROLES",
+    "RETIRED_ROLES",
     "BUDGETS",
     "MODES",
     "ATTEMPTS",

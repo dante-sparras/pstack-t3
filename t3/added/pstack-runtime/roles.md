@@ -66,7 +66,7 @@ Print the merged roles for the current project with:
 python3 <pstack-runtime>/scripts/roles.py show --cwd "$PWD" --parent "<inheritedProviderInstanceId>/<inheritedModel>" [--brief-mode <value> | --session-mode light]
 ```
 
-When the brief this call seats has a `Mode:` line, replace the bracket with `--brief-mode <value>`. Copy that line's bare value, and pass no other mode flag. When the brief has no `Mode:` line and the session is light, replace the bracket with `--session-mode light`, except for a user's explicit reflect, which passes `--session-mode full`. Otherwise delete the bracket. A call with no mode flag takes its mode from the roles files.
+When the brief this call seats has a `Mode:` line, replace the bracket with `--brief-mode <value>`. Copy that line's bare value, and pass no other mode flag. When the brief has no `Mode:` line and the session is light, replace the bracket with `--session-mode light`. Otherwise delete the bracket. A call with no mode flag takes its mode from the roles files.
 
 Always pass `--parent` with the values from `orchestrator_capabilities`. The saved catalog records whichever thread ran setup, so it never names this thread. Without `--parent`, `show` cannot settle an `inherit` seat on a thread whose model the exclude list refuses. `show`, `validate`, and `write` reject a malformed `--parent`. See [Excluded seats](#excluded-seats).
 
@@ -89,18 +89,12 @@ Do not reconstruct role defaults in the calling skill. Pass a file path to `--ca
 | `perf-issue` | 1 | Perf issue code delegates |
 | `hillclimb` | 1 | Hillclimb experiment delegates |
 | `judgment and prose` | 1 | Prose, judgment, briefs, synthesis |
-| `hardest tasks` | 1 | Cross-cutting design, concurrency, subtle algorithms |
-| `how explorer` | 1 | how |
-| `how explainer` | 1 | how |
-| `why investigators` | 1 | why, one seat model for every investigator |
-| `why synthesizer` | 1 | why |
-| `reflect tooling` | 1 | reflect |
-| `reflect judgment, divergent, synthesizer` | 1 | reflect |
 | `arena runners` | N | arena, one candidate per seat |
 | `arena cross-judge pool` | N | arena, pick one seat whose model family differs from the parent's |
 | `swarm workers` | 1 | swarm, one seat for every worker |
 | `skill tests` | 1 | pstack-author-skill fresh-child test and description eval |
-| `architect runners` | N | architect, one runner per seat |
 | `interrogate reviewers` | N | interrogate, one reviewer per seat |
 | `verifiers` | N | swarm-verify, autopilot, shipping, orchestrate verification |
 | `review backups` | N | `roles.py backup`, when `review backups` is set and no `verifiers` backups seat is left |
+
+`show`, `validate`, `write`, and `backup` refuse a role name this table lacks, unless the role is retired. The retired roles are `hardest tasks`, `how explorer`, `how explainer`, `why investigators`, `why synthesizer`, `reflect tooling`, `reflect judgment, divergent, synthesizer`, and `architect runners`. A roles file that names a retired role under `roles`, in an `exclude` entry's `roles` list, or as a `backups` key still loads. `roles.py` drops the retired role and resolves the rest. An `exclude` entry whose roles are all retired is dropped. The next `write` leaves every retired role out of the file it rewrites. `--set` and `--role` refuse a retired role.

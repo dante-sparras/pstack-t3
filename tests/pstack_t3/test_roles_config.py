@@ -153,7 +153,7 @@ class RolesConfigTest(unittest.TestCase):
         )["roles"]["bug-fix"]
         self.assertEqual(entry["seats"], [{"providerInstanceId": "cursor", "model": "claude-haiku-5-5", "options": {"effort": "high"}}])
 
-    def test_haiku_parent_inherit_resolves_for_how_explorer(self):
+    def test_haiku_parent_inherit_resolves_for_swarm_workers(self):
         catalog = {
             "inheritedProviderInstanceId": "claudeAgent",
             "inheritedModel": "claude-haiku-5-5",
@@ -164,7 +164,7 @@ class RolesConfigTest(unittest.TestCase):
                 ]}],
             }],
         }
-        entry = roles.resolve(config(**{"how explorer": ["inherit"]}), catalog, ["how explorer"])["roles"]["how explorer"]
+        entry = roles.resolve(config(**{"swarm workers": ["inherit"]}), catalog, ["swarm workers"])["roles"]["swarm workers"]
         self.assertEqual(entry["seats"], [{"providerInstanceId": "claudeAgent", "model": "claude-haiku-5-5", "options": {"effort": "medium"}}])
         self.assertEqual(entry["haikuBrief"], list(roles.HAIKU_BRIEF))
 

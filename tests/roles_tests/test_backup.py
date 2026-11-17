@@ -83,19 +83,19 @@ class BackupCliTest(BackupCliCase):
         })
 
 
-    def test_how_explorer_relaunches_on_sonnet(self):
+    def test_skill_tests_relaunches_on_sonnet(self):
         completed = self.backup(
-            "--role", "how explorer",
+            "--role", "skill tests",
             "--provider", "grok",
             "--model", "grok-4.7",
             "--options", '{"reasoningEffort": "medium"}',
         )
         self.assert_backup(completed, {
             "decision": "relaunch",
-            "role": "how explorer",
+            "role": "skill tests",
             "failed": "grok/grok-4.7",
             "seat": {"providerInstanceId": "claudeAgent", "model": "claude-sonnet-5-5", "options": {"effort": "medium"}},
-            "report": "how explorer: grok/grok-4.7 hit its usage limit; relaunched on claudeAgent/claude-sonnet-5-5 at medium",
+            "report": "skill tests: grok/grok-4.7 hit its usage limit; relaunched on claudeAgent/claude-sonnet-5-5 at medium",
         })
 
 
