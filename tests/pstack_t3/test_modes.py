@@ -25,8 +25,8 @@ from tests.pstack_t3.support import pointer_sentence, unfenced_lines, heading_sl
 
 MODE_POINTER_SITES = {
     **{f"{name}/SKILL.md": "skill" for name in (
-        "poteto-mode", "how", "why", "architect", "arena", "no-comments", "swarm", "interrogate",
-        "show-me-your-work", "recall", "automate-me", "maintain-verification-skill", "reflect",
+        "poteto-mode", "how", "arena", "no-comments", "swarm", "interrogate",
+        "show-me-your-work", "recall", "automate-me", "maintain-verification-skill",
         "pstack-author-skill", "landing",
     )},
     **{f"poteto-mode/playbooks/{stem}.md": "playbook" for stem in (

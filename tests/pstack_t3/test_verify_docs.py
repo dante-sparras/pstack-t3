@@ -60,7 +60,7 @@ class VisualReportsDocTest(unittest.TestCase):
             self.assertIn(sentence, self.section)
 
     def test_orchestrate_reply_keeps_upstream_facts_and_links_the_section(self):
-        text = override_text("poteto-mode/playbooks/orchestrate.md")
+        text = (ROOT / "t3/added/poteto-mode/playbooks/orchestrate.md").read_text()
         reply = next(line for line in text.splitlines() if line.startswith("**Reply:**"))
         self.assertTrue(reply.startswith(
             "**Reply:** what landed against the goal, each PR's live state and verdict with its link, "
