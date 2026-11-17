@@ -27,7 +27,7 @@ PLAYBOOK_FILES = {
     "Refactoring": "playbooks/refactoring.md",
     "Prototype": "playbooks/prototype.md",
     "Visual parity": "playbooks/visual-parity.md",
-    "Authoring or modifying a skill": "playbooks/authoring-a-skill.md",
+    "Authoring a skill": "playbooks/authoring-a-skill.md",
     "Eval": "playbooks/eval.md",
     "Babysit": "playbooks/babysit.md",
     "Shipping": "playbooks/shipping.md",
@@ -37,8 +37,8 @@ PLAYBOOK_FILES = {
     "Autopilot-stack": "playbooks/autopilot-stack.md",
     "Session pickup": "playbooks/session-pickup.md",
     "Pause safely": "playbooks/pause-safely.md",
-    "Multi-phase or multi-PR plan": "playbooks/multi-phase-plan.md",
-    "Worktree and simulator cleanup": "playbooks/worktree-cleanup.md",
+    "Multi-phase plan": "playbooks/multi-phase-plan.md",
+    "Worktree cleanup": "playbooks/worktree-cleanup.md",
     "Opening a PR": "playbooks/opening-a-pr.md",
 }
 def fence_git_environment():

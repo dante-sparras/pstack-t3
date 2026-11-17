@@ -20,6 +20,8 @@ GROUPS = [
 BULLET = re.compile(r"^- \*\*(.+?)\.\*\* (.+)$", re.M)
 # A bullet gives its file as a backticked playbooks/<name>.md that ends the bullet, with or without a "File: " lead-in.
 GIVEN_FILE = re.compile(r"\s*(?:File: )?`(playbooks/[\w-]+\.md)`\.?$")
+# Upstream since 0.15.43 names every playbook on one line, as in "Investigation, Bug fix, Opening a PR."
+TITLE_LIST = re.compile(r"[A-Z][A-Za-z -]*(?:, [A-Z][A-Za-z -]*)+\.")
 
 
 def description(skill_md):
@@ -52,6 +54,9 @@ def _scan_playbooks(text):
             file = given.group(1) if given else f"playbooks/{kebab(title)}.md"
             entries.append((title, file, GIVEN_FILE.sub("", summary).strip()))
             continue
+        if TITLE_LIST.fullmatch(line):
+            entries.extend((title, f"playbooks/{kebab(title)}.md", "") for title in line[:-1].split(", "))
+            continue
         if line.startswith(("- ", "* ", "+ ")):
             unparsed.append(
                 f'poteto-mode/SKILL.md:{number}: playbook bullet does not match "- **Title.** summary": {line.strip()[:120]}'
@@ -60,7 +65,9 @@ def _scan_playbooks(text):
 
 
 def playbook_entries(skills):
-    """Return one (title, file, summary) tuple per "- **Title.** summary" line in poteto-mode's Playbooks section, in list order.
+    """Return one (title, file, summary) tuple per playbook in poteto-mode's Playbooks section, in list order.
+
+    A "- **Title.** summary" bullet names one playbook. A line of comma-separated titles ending in a period names one per title, each with an empty summary.
 
     The section starts on the line after the first level-two heading whose text is Playbooks and ends before the next level-two heading. A level-three heading does not end it.
     file is the skill-relative path GIVEN_FILE finds at the end of the bullet, otherwise playbooks/<kebab(title)>.md.
@@ -70,7 +77,10 @@ def playbook_entries(skills):
 
 
 def playbooks(skills):
-    return [f"| [{title}](../skills/poteto-mode/{file}) | {summary.replace('|', '/')} |" for title, file, summary in playbook_entries(skills)]
+    entries = playbook_entries(skills)
+    if not any(summary for _, _, summary in entries):
+        return ["| Playbook |", "| --- |", *(f"| [{title}](../skills/poteto-mode/{file}) |" for title, file, _ in entries)]
+    return ["| Playbook | For |", "| --- | --- |", *(f"| [{title}](../skills/poteto-mode/{file}) | {summary.replace('|', '/')} |" for title, file, summary in entries)]
 
 
 def missing_playbooks(skills):
@@ -109,7 +119,7 @@ def render(skills):
         lines.append("")
     rows = playbooks(skills)
     lines += ["## poteto-mode playbooks", "", "`$poteto-mode` matches your request to one of these and follows its steps. Opening a PR runs at the end of the others.", "",
-              "| Playbook | For |", "| --- | --- |", *rows, ""]
+              *rows, ""]
     return "\n".join(lines)
 
 
