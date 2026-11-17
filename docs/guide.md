@@ -164,6 +164,7 @@ A release is tagged only after the stable check passes. The operator runs `setup
 | Codex | `~/.agents/skills` | `.agents/skills` |
 | Grok | `~/.grok/skills` | `.grok/skills` |
 | Cursor | `~/.cursor/skills` | `.cursor/skills` |
+| OpenCode | `~/.config/opencode/skills` (or `$XDG_CONFIG_HOME/opencode/skills`) | `.opencode/skills` |
 
 
 ## Map

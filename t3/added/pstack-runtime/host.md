@@ -40,6 +40,7 @@ T3's `$` picker lists each provider's native skills, except Muse's. Muse still l
 | Codex | `~/.agents/skills` | `.agents/skills` |
 | Grok | `~/.grok/skills` | `.grok/skills` |
 | Cursor | `~/.cursor/skills` | `.cursor/skills`, and it also reads `.agents/skills` and `.claude/skills` |
+| OpenCode | `~/.config/opencode/skills` (or `$XDG_CONFIG_HOME/opencode/skills`) | `.opencode/skills`, and it also reads `.claude/skills` and `.agents/skills` at lower precedence |
 
 Every child gets the `t3-code` server. Other MCP servers come from each provider's own configuration, so a child on another provider may lack one. A brief that needs a specific MCP server says so, and the child reports `MCP unavailable` instead of guessing.
 
