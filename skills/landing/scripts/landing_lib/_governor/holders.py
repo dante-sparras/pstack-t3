@@ -22,7 +22,6 @@ def _dump_holder(path, holder):
     temporary = path.with_name(f"{path.name}.{os.getpid()}.tmp")
     previous = os.umask(0o077)
     try:
-        # os.open asks for 0o666 and the 0o077 umask leaves 0o600, so the name is owner-readable when it appears.
         descriptor = os.open(temporary, os.O_RDWR | os.O_CREAT | os.O_TRUNC, 0o666)
     finally:
         os.umask(previous)

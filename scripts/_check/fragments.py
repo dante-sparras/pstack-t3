@@ -5,9 +5,6 @@ from pathlib import Path
 from .vocabulary import Layout
 
 FRAGMENT_DIRS = ("brigade", "brigade-admin", "pstack-runtime")
-# A markdown link target holding a #, in-file (#x) or file-plus-fragment (other.md#x).
-# The destination holds no space. An optional title in double quotes, single quotes, or parens is excluded.
-# A backslash escapes the next character inside a title.
 FRAGMENT_LINK = re.compile(r"\]\(\s*([^\s)]*#[^\s)]*)\s*(?:\"(?:[^\"\\]|\\.)*\"|'(?:[^'\\]|\\.)*'|\((?:[^)\\]|\\.)*\))?\s*\)")
 VENDOR_SKILLS_PATH = Path(__file__).resolve().parents[2] / "vendor/pstack/skills"
 

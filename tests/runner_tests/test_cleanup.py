@@ -30,7 +30,6 @@ NO_PRCTL = (
     "    pass\n"
 )
 
-# The worker ends the watcher that would end it when its runner dies, marks itself, then sleeps. Nothing ends it after its runner is killed.
 LOST_WORKER = """
     import os
     import signal
@@ -74,7 +73,6 @@ LOST_WORKER = """
             time.sleep(60)
 """
 
-# A worker that passes marks.mark only the numeric pid another process holds, which is what the pid becomes after the kernel gives it to that process.
 REUSE_BEFORE_MARK = """
     import unittest
     from pathlib import Path

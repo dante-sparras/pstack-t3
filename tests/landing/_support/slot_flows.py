@@ -394,7 +394,6 @@ class SlotFlowsBase:
 
 
     def assert_live(self, pid):
-        # A zombie answers os.kill(pid, 0) too, so the member's state read is the liveness witness.
         state = land._ps_line(pid, "stat=")
         self.assertIsNotNone(state, f"ps could not read pid {pid}")
         self.assertFalse(state.strip().startswith("Z"), f"pid {pid} is a zombie")

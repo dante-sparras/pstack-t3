@@ -72,7 +72,6 @@ def playbook_stem(value):
     return stem
 
 
-# poteto-mode puts the pointer to its worker.md on a brief's first line, above the persona.
 WORKER_LINE = re.compile(r"\s*Read [^\n]*worker\.md before anything else\.[ \t]*(?:\n|$)")
 
 

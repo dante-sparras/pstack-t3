@@ -15,7 +15,6 @@ from . import test_apply
 
 
 class ApplyIgnoredTest(BrigadeTest):
-    # Helpers come from ApplyTest by reference. Subclassing it would run its tests a second time here.
     git = test_apply.ApplyTest.git
     contract = test_apply.ApplyTest.contract
     apply = test_apply.ApplyTest.apply
@@ -23,8 +22,6 @@ class ApplyIgnoredTest(BrigadeTest):
     edit_args = test_apply.ApplyTest.edit_args
 
     def test_apply_skips_git_ignored_build_output_fails_when_the_build_writes_an_ignored_file(self):
-        # Processes: git and land build the fixture project and its contract; edits apply reads the contract and runs the
-        # build script, which writes ignored files.
         build = ('import pathlib\ntext = pathlib.Path("src/greeting.txt").read_text()\n'
                  'pathlib.Path("out").mkdir(exist_ok=True)\n'
                  'pathlib.Path("out/greeting.txt").write_text(text.upper())\n'

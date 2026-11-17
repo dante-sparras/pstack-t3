@@ -179,7 +179,6 @@ def open_t3(path):
     try:
         connection.execute("PRAGMA query_only=1")
         connection.execute("BEGIN")
-        # BEGIN is deferred, so this read is what takes the lock the snapshot is held by.
         connection.execute("select 1 from sqlite_master limit 1")
     except sqlite3.Error as error:
         connection.close()
@@ -244,7 +243,6 @@ def parse_time(text, where):
     try:
         if not STAMP.fullmatch(text):
             raise ValueError
-        # Python 3.10 rejects the Z that T3 writes.
         return datetime.fromisoformat(text.replace("Z", "+00:00")).timestamp()
     except (TypeError, ValueError, OverflowError):
         raise SourceError(f"T3's {where} is not a timestamp; {CHANGED}") from None
@@ -361,7 +359,6 @@ def read_t3(connection, window, roots, coordinators=()):
             parent_of[child] = parent
             delegations[child] = Delegation(parse_status(status, end is not None), start, end)
     check_parents(parents_of)
-    # Every turn is read and compared as an instant. A filter on the stored text would hide a row whose text sorts before the window.
     turns, ran = {}, set()
     for thread, status, requested, completed in connection.execute(f"select thread_id, status, requested_at, completed_at from {RUNS}"):
         thread, status = text_in(thread, RUNS, "thread_id"), text_in(status, RUNS, "status")

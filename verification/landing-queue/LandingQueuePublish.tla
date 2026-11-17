@@ -1,10 +1,6 @@
 ---- MODULE LandingQueuePublish ----
-\* Moved from LandingQueue.tla unchanged: publish mode.
 EXTENDS LandingQueueBase
 
-\* ---------------------------------------------------------------------------
-\* Publish mode.
-\* ---------------------------------------------------------------------------
 
 RecordLanding ==
   /\ Mode = "publish"
@@ -15,7 +11,6 @@ RecordLanding ==
   /\ UNCHANGED <<leaseVars, clock, floor, entryLease, landedAs, attempt, worktree,
                  paused, secondDrain, tip, forgeVars, historyVars>>
 
-\* Break = ignore-failed-check is a caller that takes a failed check for a pass.
 BeginPublish ==
   /\ Mode = "publish"
   /\ (run.pc = "check-pass" \/ (Break = "ignore-failed-check" /\ run.pc = "check-fail"))
@@ -24,9 +19,6 @@ BeginPublish ==
   /\ UNCHANGED <<leaseVars, clock, floor, entryVars, worktree, paused, secondDrain,
                  tip, forgeVars, historyVars>>
 
-\* The lease moves trunk only from exactly `base`. Break = publish-no-base-check
-\* is a bare `--force` in its place. A plain `git push` would still refuse a
-\* non-fast-forward update, so it is not what this variant stands for.
 Publish ==
   /\ run.pc = "inserted"
   /\ (tip = run.base \/ Break = "publish-no-base-check")
@@ -53,9 +45,6 @@ AbandonAttempt ==
   /\ run' = IdleRun("ready")
   /\ UNCHANGED <<leaseVars, clock, floor, worktree, paused, secondDrain, tip, forgeVars, historyVars>>
 
-\* Settles on the remembered push result. Break = settle-before-publish settles
-\* with no push behind it. Break = lease-released-before-settle comes after
-\* ReleaseThenSettle.
 SettleLanded ==
   /\ CASE Break = "settle-before-publish"        -> run.pc = "inserted"
        [] Break = "lease-released-before-settle" -> run.pc = "released"

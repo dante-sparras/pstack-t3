@@ -192,8 +192,6 @@ def command_write(args):
         if not args.replace:
             raise RolesError(f"{target}: expected an object")
         loaded = {}
-    # A default write keeps the stored keys the flags do not name.
-    # --replace starts over from the flags, the stored allow list, and a stored project escalate.
     raw = loaded
     allow = stored_allow(raw, target).remove_all(args.deny_opencode or []).add_all(args.allow_opencode or [])
     stored_roles = raw.get("roles", {})

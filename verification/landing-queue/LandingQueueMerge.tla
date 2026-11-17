@@ -1,13 +1,6 @@
 ---- MODULE LandingQueueMerge ----
-\* Moved from LandingQueue.tla unchanged: merge mode. Polling is in
-\* LandingQueueBase.tla, where the drain end reads it as well.
 EXTENDS LandingQueueBase
 
-\* ---------------------------------------------------------------------------
-\* Merge mode. `poll` reads the store each time, so these need no process state
-\* beyond holding the flock, and the model allows them in any order. A Crash can
-\* land between any two.
-\* ---------------------------------------------------------------------------
 
 RecordCandidate ==
   /\ Mode = "merge"
@@ -77,17 +70,12 @@ AbsenceSeen(e) ==
   /\ UNCHANGED <<leaseVars, clock, floor, entryVars, drainVars, tip, prOpen, prStored,
                  prHead, checkState, armed, mergedAs, seenEarlier, historyVars>>
 
-\* A boolean, not a duration. It says the five minutes have passed.
 GraceEnds(e) ==
   /\ absence[e] = "waiting"
   /\ absence' = [absence EXCEPT ![e] = "over"]
   /\ UNCHANGED <<leaseVars, clock, floor, entryVars, drainVars, tip, prOpen, prStored,
                  prHead, checkState, armed, mergedAs, seenEarlier, historyVars>>
 
-\* What request_merge lets through. Passed checks go ahead. Absent checks go
-\* ahead only after the grace, and a repository with no required checks merges
-\* that way. Break = absence-counts-drains is the rule at the parent of pull
-\* request #474. Break = merge-without-checks waits for neither.
 ChecksAllowMerge(e) ==
   \/ checkState[e] = "passed"
   \/ (checkState[e] = "absent" /\ absence[e] = "over")
@@ -107,12 +95,6 @@ RequestMerge(e) ==
   /\ UNCHANGED <<leaseVars, clock, floor, entryVars, drainVars, tip, prOpen, prStored,
                  prHead, checkState, mergedAs, absence, seenEarlier, historyVars>>
 
-\* HeadMoves never returns to the candidate, so one check state per pull request
-\* always describes the head the queue reads. `--match-head-commit` holds the merge to the checked head, and required
-\* checks that have started hold it until they pass. The merged commit may be a
-\* squash or a rebase, and trunk may have moved since the request. Break =
-\* merge-without-checks lets a pending check through. Break =
-\* no-match-head-commit drops the pin on the head.
 ForgeCompletes(e) ==
   LET head     == prHead[e]
       allowed  == checkState[e] \in {"passed", "absent"}
@@ -135,8 +117,6 @@ ForgeCompletes(e) ==
   /\ UNCHANGED <<leaseVars, clock, floor, entryVars, drainVars, prOpen, prStored, prHead,
                  checkState, armed, absence, seenEarlier, checkedAt, staleWrite, droppedCoverage>>
 
-\* take_pr compares trees, not parents. A tree that differs settles landed and
-\* pauses the queue in the same transaction. Break = no-tree-check drops the pause.
 SettleMerged(e) ==
   /\ Polling
   /\ entryState[e] = "awaiting-merge"

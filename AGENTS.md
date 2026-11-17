@@ -4,7 +4,7 @@ pstack-t3 is Lauren Tan's pstack, ported to run natively in T3 Code on any provi
 
 ## Layout
 
-- `vendor/pstack/` is upstream, byte-identical to the commit in `upstream.json`. Never edit it. `scripts/sync_upstream.py` replaces it.
+- `vendor/pstack/` is upstream at the commit in `upstream.json` with its code comments deleted. Never edit it. `scripts/sync_upstream.py` replaces it.
 - `t3/runtime.md` becomes `skills/pstack-runtime/SKILL.md`. It is the single contract for delegation, roles, isolation, scheduling, verification, history, and PR linking. Skills link to it instead of restating it.
 - `t3/scripts/roles.py` resolves roles to `delegate_task` targets. Tests in `tests/`.
 - `t3/setup.md` becomes `skills/setup-pstack/SKILL.md`.
@@ -41,6 +41,10 @@ Start from the upstream file and change only what T3 changes. Upstream's rules, 
 
 `python3 scripts/sync_upstream.py --merge` syncs and, for each override or persona whose upstream file changed, either writes a clean three-way merge of it or leaves the override or persona as it is and names it. Add `--conflicts <dir>` to also write git's conflict-marked merge of each override or persona whose merge conflicts under `<dir>`, a path outside the checkout that does not exist yet. A persona's conflict-marked merge is written to `<dir>/agents/<name>.md`. A clean merge can carry a new Cursor mechanism in upstream's lines, so a merged override or persona still needs the review in step 6 and the build's Cursor-leftover check, which `python3 scripts/build.py --skip-lock` reaches while the lock is stale.
 
+## No code comments
+
+Code holds no comments. Keep only lines a tool reads to run: a shebang, a Python encoding line, and lint or type directives such as `# noqa`, `# type:`, `// @ts-expect-error`, and `// eslint-disable`. Put an explanation in a name, a docstring, a test, or the PR description. `python3 scripts/comments.py` lists every comment and exits 1 when it finds one. `python3 scripts/comments.py --fix` deletes them. The `comments` workflow runs the check on Linux and Windows.
+
 ## Writing style
 
 Follow upstream's: short declarative sentences, no long dashes, no mid-sentence colons, no hedging. Every instruction names a concrete tool, path, or check.
@@ -50,6 +54,7 @@ Follow upstream's: short declarative sentences, no long dashes, no mid-sentence 
 ```bash
 python3 scripts/run_tests.py
 python3 scripts/build.py
+python3 scripts/comments.py
 ```
 
 Never commit credentials, transcripts, local configs, catalog snapshots, or thread IDs.

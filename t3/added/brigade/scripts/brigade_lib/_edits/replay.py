@@ -17,9 +17,7 @@ from brigade_lib.shared import BrigadeError, command_words
 NEEDS_COMMANDS = ("edits verify needs a build command and a check command; "
                   "run set --build-command <command> --check-command <command>, with none for one the project lacks")
 NO_COMMAND = "none"
-# The most lines a small code fix changes.
 SMALL_FIX_LINES = 20
-# The diff algorithms the count asks git for.
 GIT_ALGORITHMS = ("myers", "minimal", "patience", "histogram")
 SMALL_FIX = ("the applied change counts {count} lines, and a small code fix counts at most {cap}; it needs a second "
              "review. The count is, for each changed file, the largest added plus deleted total git diff --numstat "
@@ -28,22 +26,18 @@ SMALL_FIX = ("the applied change counts {count} lines, and a small code fix coun
              "ending in .md is not counted, and neither is a .py path whose AST is the same once its docstrings are "
              "removed, so in a .py path a change to a comment, a docstring, or formatting alone is not counted. A "
              "change to a printed message or to code on a test line changes that AST and is counted")
-# Why an edit cannot apply to the reviewed commit.
 EDIT_FAILS = {
     "missing": "FAIL {path}: no regular file at {sha}",
     "count": "FAIL {path}: old text of Edit {number} occurs {count} times at {sha}",
     "overlap": "FAIL {path}: Edit {number} overlaps another edit",
 }
-# One line per compared path, keyed by whether the build changed the path in the scratch copy and whether the copy and the head agree at it.
 PATH_LINES = {
     (False, True): "edited {path}",
     (True, True): "built {path}",
     (False, False): "FAIL {path}: differs from {sha} with the edits applied",
     (True, False): "FAIL {path}: differs from what the build writes",
 }
-# The line for the one added path a verify leaves out: this round's change-note fragment.
 SKIPPED_LINE = "skipped {path}: this round's change note"
-# The kind and the execute bit of each tree mode that edits verify compares by content.
 BLOB_MODES = {"100644": ("file", False), "100755": ("file", True), "120000": ("link", False)}
 
 
@@ -342,7 +336,6 @@ def replay(project_root, reviewed, before, after, edits, build, check, sha, skip
         scratch = Path(directory)
         archive = git(project_root, "archive", "--format=tar", reviewed).stdout
         with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
-            # extractall has no filter argument in Python 3.10 before 3.10.12 or in 3.11 before 3.11.4.
             tar.extractall(scratch, **({"filter": "tar"} if hasattr(tarfile, "tar_filter") else {}))
         extracted = digests(scratch)
         files = {path for path, digest in extracted.items() if digest.kind == "file"}

@@ -95,7 +95,6 @@ class TornWritesMixin:
         self.assertEqual(self.brigade("core", "watch", ok=False), line)
         self.assertEqual(self.brigade("docs", "ticket", "list", ok=False), line)
         for words, cwd in ((("walk",), None), (("--at", ".", "ticket", "list"), self.dir("docs"))):
-            # inherited environment
             result = real_process(
                 ProcessReason.INHERITED_ENV, SCRIPT, ["--store", str(self.store), *words], cwd=cwd,
             )
@@ -108,7 +107,6 @@ class TornWritesMixin:
         self.brigade("docs", "ticket", "add", "--kind", "fix", "--summary", "b")
         rail = self.dir("docs") / "rail.tsv"
         rail.write_text(rail.read_text() + "not a row\n")
-        # inherited environment
         walked = real_process(ProcessReason.INHERITED_ENV, SCRIPT, ["--store", str(self.store), "walk"])
         self.assertEqual((walked.returncode, walked.stdout, walked.stderr), (1, "\n".join([
             f"{_shown_root(self.project)}: no landing contract",
@@ -126,7 +124,6 @@ class TornWritesMixin:
         rail.write_text(rail.read_text() + "not a row\n")
         verdicts = self.dir("engine") / "pass.tsv"
         verdicts.write_text(verdicts.read_text() + "not a row\n")
-        # inherited environment
         walked = real_process(ProcessReason.INHERITED_ENV, SCRIPT, ["--store", str(self.store), "walk"])
         self.assertEqual((walked.returncode, walked.stdout, walked.stderr), (1, "\n".join([
             f"{_shown_root(self.project)}: no landing contract",

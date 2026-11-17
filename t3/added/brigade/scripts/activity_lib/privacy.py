@@ -410,7 +410,6 @@ def privacy_of(store, t3, paths=()):
     for unit in store.units:
         ids.update((unit.worker, unit.task, *unit.earlier_workers))
     cells = tuple(row["thread"] for row in store.threads if row["thread"])
-    # A relative path as given can be one ordinary word, which a page may hold for another reason.
     places = {form for path in (store.project_root, *map(str, paths)) if path
               for form in (os.path.abspath(path), os.path.realpath(path), *((path,) if os.path.isabs(path) else ()))}
     return Privacy(ids, places, filter(None, map(request_name, (*ids, *cells))), cells)

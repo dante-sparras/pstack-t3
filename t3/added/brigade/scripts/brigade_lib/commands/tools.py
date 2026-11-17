@@ -23,8 +23,6 @@ from pathlib import Path, PurePosixPath
 from brigade_lib import full_send, seam
 from brigade_lib._reviews.threads import cooldown_seats, moment_of
 from brigade_lib.briefs import brief_attempt, brief_file
-# dish.py imports current_brief_mode from this module while it loads, so this binds the module object
-# that import already made, and reads its backup runner and seat check once it is complete.
 from brigade_lib.commands._items import dish as _dish
 from brigade_lib.shared import BrigadeError
 from brigade_lib.spend import add_arguments, spend_text
@@ -187,7 +185,6 @@ def launch_backup(project_root, args, role, mode, selected, live):
             "--provider", selected["instanceId"], "--model", selected["model"]]
     if selected["options"]:
         argv += ["--options", json.dumps(selected["options"])]
-    # roles.py reads --out as a provider, so one provider with two cooling seats is passed once.
     for name in dict.fromkeys(entry[0].partition("/")[0] for entry in live):
         argv += ["--out", name]
     if mode is not None:
@@ -215,7 +212,6 @@ def launch_text(restaurant, args):
         argv += ["--brief-mode", mode]
     payload = show_payload(args.catalog, argv)
     selected = selection_from_show(payload, role)
-    # A cooldown covers every model on its provider, because the usage-limit path excludes by provider.
     cooling = [entry for entry in live if entry[0].partition("/")[0] == selected["instanceId"]]
     if not cooling:
         return json.dumps(selected)

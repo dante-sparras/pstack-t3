@@ -9,7 +9,6 @@ SCRIPT = ROOT / "t3/added/brigade/scripts/brigade.py"
 SUPPORT = ROOT / "tests/brigade/support.py"
 CODEX = "codex/gpt-6.1-sol"
 CLAUDE = "claudeAgent/claude-opus-5-5"
-# Thread ids the threads.tsv tests use. No real thread id appears in this repository.
 THREAD_A = "mcp:00000000-0000-4000-8000-000000000001"
 THREAD_B = "mcp:00000000-0000-4000-8000-000000000002"
 THREAD_C = "mcp:00000000-0000-4000-8000-000000000003"
@@ -25,9 +24,7 @@ ITEM_DECISION = (
     "brigade: an item decision's default must be one of its options, "
     "with at least one other option that closes it"
 )
-# The brigade reporting docs join in BRIGADE_DOCS order. Later items append to this tuple.
 BRIGADE_DOCS = ("SKILL.md", "admin-reporting.md", "opening.md", "recovery.md", "script.md", "views.md")
-# This repository's shared-document catalog and timebox, the value its own store would record.
 DOC_SETTINGS = {
     "sharedDocs": [
         {"path": "README.md", "kind": "file"},

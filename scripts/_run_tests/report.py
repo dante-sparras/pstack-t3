@@ -33,8 +33,8 @@ def account(shard: Shard, events: list[dict], ended: Ended, stopped: bool = Fals
     """Return one verdict for every seq of the shard, from the events the runner read, how the worker ended, and whether the runner stopped reading the result file."""
     given = set(shard.seqs)
     classes = dict(zip(shard.seqs, shard.classes))
-    skipped: set[tuple[str, str]] = set()   # the method and name of each skipped event so far
-    last: dict[int, str] = {}   # the kind of the last event accepted for a seq
+    skipped: set[tuple[str, str]] = set()
+    last: dict[int, str] = {}
     results: dict[int, Verdict] = {}
     skips: dict[int, bool] = {}
     fixtures: list[Problem] = []

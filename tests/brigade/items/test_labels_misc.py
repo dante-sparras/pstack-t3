@@ -82,7 +82,6 @@ class LabelsMiscMixin:
     def test_the_built_brigade_refuses_a_bedrock_claude_author_with_a_claude_verifier(self):
         self.fired_bug_fix()
         built = ROOT / "skills/brigade/scripts/brigade.py"
-        # process exit status
         result = real_process(
             ProcessReason.EXIT_STATUS, built,
             ["--store", str(self.store), "--at", str(self.at), *_owner_words(self.at),

@@ -228,7 +228,6 @@ def patch_legacy(state, add_links, add_backups, remove_links, remove_backups, ad
         return (), ()
     path = Path(state) / layout.LEGACY_NAME
     found = legacy_lists(path)
-    # Older installers still read this file, so a cleanup leaves empty lists in place.
     if found is not None:
         data, links, backups = found
     elif adding:
@@ -296,7 +295,6 @@ def add_records(step, state, root):
     return undo
 
 def remove_records(step, state, root):
-    # Owner file first on add and last on remove, so a crash keeps an extra claim.
     patch_legacy(state, (), (), step.remove_links, step.remove_backups, False)
     if step.remove_claims:
         claims = current_claims(state, root)

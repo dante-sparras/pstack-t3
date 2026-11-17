@@ -152,8 +152,6 @@ def check_lock(update):
     for key in locked:
         if key in current:
             continue
-        # A locked key missing from the current digests that still has its T3 file is a persona with no
-        # vendored counterpart. Any other locked key names an entry with no T3 file.
         row = by_key.get(key)
         noun = entry_noun(key)
         detail = (
@@ -243,7 +241,6 @@ def replace_tree(source, destination):
     incoming = destination.with_name(destination.name + ".incoming")
     outgoing = destination.with_name(destination.name + ".outgoing")
     if outgoing.exists() and not destination.exists():
-        # A previous swap died between renames; its old tree is the only good copy.
         outgoing.rename(destination)
     for leftover in (incoming, outgoing):
         if leftover.exists():

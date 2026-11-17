@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Any
 
 
-# Each pair is a pattern and the reason in the finding.
 FORBIDDEN = [
     (r"subagent_type", "Cursor Task schema; use delegate_task with role and target"),
     (r"environment: ?\"(?:cloud|local)\"", "Cursor cloud agents; T3 children run locally"),
@@ -30,9 +29,7 @@ FORBIDDEN = [
     ),
 ]
 FRONTMATTER_REQUIRED = ("name", "description")
-# The setup gate's entry in REQUIRED_TOOLS, whose gate string names the minimum T3 Code version.
 SETUP_GATE = "setup-pstack/SKILL.md"
-# Generated files that teach a PR wait must name T3's watch tools. Absent files are not checked.
 REQUIRED_TOOLS = {
     "pstack-runtime/SKILL.md": ("watch_pull_request", "unwatch_pull_request"),
     "landing/SKILL.md": ("watch_pull_request", "unwatch_pull_request"),
@@ -46,10 +43,7 @@ REQUIRED_TOOLS = {
     SETUP_GATE: ("watch_pull_request", "T3 Code 0.1.3 or later"),
 }
 LINK = re.compile(r"\]\(((?!https?:|mailto:|#)[^)\s]+)\)")
-# A T3 thread link is `t3-thread://v1/<threadId>` or `<t3-thread://v2/<environmentId>/<threadId>>`. It names no file.
 THREAD_LINK = re.compile(r"t3-thread://v[12]/[^)\s]")
-# T3 Code 0.1.3 replaced each name here with the merged tool the value names. Keyed by the retired
-# name, so the table is the one place a name is added and the reason is derived from it.
 RETIRED_TOOLS = {
     "update_scheduled_task": "schedule_task with scheduledTaskId",
     **{f"preview_{action}": "preview_act with action" for action in
@@ -60,17 +54,11 @@ RETIRED_TOOLS = {
     **{f"t3_thread_{action}": "t3_thread_transfer with action" for action in ("fork", "merge_back", "transfers")},
     "t3_thread_configuration": "t3_thread_configure with no modelSelection",
 }
-# A retired name has no letter or digit before it and no letter, digit, or underscore after it.
-# Thus `mcp__t3-code__preview_click` matches and `t3_thread_transfer` does not.
 RETIRED_TOOL = re.compile(
     r"(?<![A-Za-z0-9])(?:" + "|".join(sorted(RETIRED_TOOLS, key=len, reverse=True)) + r")(?![A-Za-z0-9_])"
 )
-# The checkout scan adds the sources that render into the judged tree and the hand-written docs beside it.
 RETIRED_SOURCE_TOPS = ("t3", "docs")
-# History keeps the names its release shipped. docs/cli is generated from t3/scripts, which the
-# checkout scan reads directly, and the build writes that page after its own check runs.
 RETIRED_SKIPPED = (("docs", "changelog"), ("docs", "cli"))
-# Bash ends a <<'JSON' body only on a line that is JSON and nothing else.
 CATALOG_HEREDOC_OPEN = "<<'JSON'"
 CATALOG_HEREDOC_CLOSER = "JSON"
 RENDERED_MARKER = Path("pstack-runtime/scripts/roles.py")

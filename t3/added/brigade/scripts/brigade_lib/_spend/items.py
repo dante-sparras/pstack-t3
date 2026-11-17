@@ -154,7 +154,6 @@ def _rows(items, by):
     rows = []
     for key in order:
         group = tuple(buckets[key])
-        # A reviewer row has no wall clock, so the item duration is not copied onto it.
         walls = [Measure.missing(NOT_RECORDED) for _ in group] if by == "reviewer" else [item.wall for item in group]
         threads = [Measure.missing(NOT_RECORDED) if item.threads is None else Measure.of(len(item.threads)) for item in group]
         rows.append(_Row(

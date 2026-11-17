@@ -329,7 +329,7 @@ def check_shape(config, origin):
             raise ModeSettingsError(f"{origin}: escalate must be a list of strings")
         for item in escalate:
             try:
-                canonical(item, "escalate pattern")  # traversal check only; the stored pattern stays raw
+                canonical(item, "escalate pattern")
             except ModeSettingsError:
                 raise ModeSettingsError(f"{origin}: escalate pattern {item!r} leaves the repository") from None
     roles = config.get("roles", {})

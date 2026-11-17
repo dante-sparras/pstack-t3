@@ -28,7 +28,6 @@ PANEL_ROLES = [
 ROLES = SINGLE_ROLES + PANEL_ROLES
 
 
-# A roles file written before these roles were retired still names them. Loading drops them, and the next write leaves them out.
 RETIRED_ROLES = frozenset({
     "hardest tasks",
     "how explorer",
@@ -68,7 +67,7 @@ DRIVER_RUNTIME_MODES = {"muse": frozenset({"approval-required", "full-access"})}
 RUNTIME_MODE_GAP = "runtimeModeGap"
 
 
-CURSOR_DRIVER = "cursor"   # its harness sends target.options as a JSON string, which T3 refuses
+CURSOR_DRIVER = "cursor"
 
 
 HAIKU_BRIEF = (

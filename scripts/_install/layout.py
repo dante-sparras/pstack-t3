@@ -54,7 +54,6 @@ def extra_dirs(scope_root, user):
         "codex": [base / ".codex" / "skills"],
         "grok": [],
         "cursor": [base / ".agents" / "skills", base / ".codex" / "skills", claude],
-        # OpenCode also reads .claude/skills and .agents/skills, but its own directory takes precedence over both.
         "opencode": [],
     }
 
@@ -101,7 +100,6 @@ def describe(path):
         return f"link to {system.read_link(path)}"
     return "directory" if os.path.isdir(path) else "file"
 
-# Path.exists() reads each of these as "not there" on Python 3.10 and 3.12.
 ABSENT = (errno.ENOENT, errno.ENOTDIR, errno.ELOOP)
 
 ADRIFT = ("{file} records the relative path {path}, and the system could not name this run's working directory "

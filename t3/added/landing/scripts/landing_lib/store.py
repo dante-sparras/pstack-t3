@@ -338,7 +338,6 @@ def _item_line(store, entry):
 
 def configured_identity(repo):
     """git config user.name and user.email read in repo, with no character removed. None unless both have a non-empty value."""
-    # -z ends a value with a NUL, which no value holds.
     name, email = (seam.git("config", "-z", "--get", key, cwd=repo, check=False, exact=True).stdout.removesuffix("\0")
                    for key in ("user.name", "user.email"))
     return Identity(name, email) if name and email else None

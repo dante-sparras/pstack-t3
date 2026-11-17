@@ -10,7 +10,6 @@ from tests import isolation
 
 isolation.install()
 
-# Injected git attributes and configuration leave the applied count unchanged.
 import os
 import subprocess
 from pathlib import Path

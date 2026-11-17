@@ -35,8 +35,6 @@ class SlotCallers:
         self.governor = test.base / "state/pstack-t3/governor"
         self.governor.mkdir(parents=True, exist_ok=True)
         (self.governor / "governor.json").write_text(json.dumps({"slots": slots}))
-        # The suite may itself run inside a slot. A child that inherits LAND_SLOT takes no lock,
-        # and an inherited LAND_SLOT_FILES would name the suite's slot files.
         self.env = {key: value for key, value in os.environ.items() if key not in {"LAND_SLOT", "LAND_SLOT_FILES"}}
         self.stamp = 0
         while (test.base / f"slot-log-{self.stamp}").exists():
@@ -57,7 +55,6 @@ class SlotCallers:
 
     def fifo(self, path):
         os.mkfifo(path)
-        # Keep both ends open so a write never waits for a reader.
         self.descriptors.append(os.open(path, os.O_RDWR | os.O_NONBLOCK))
         return self.descriptors[-1]
 

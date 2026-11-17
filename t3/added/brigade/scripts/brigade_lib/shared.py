@@ -47,8 +47,6 @@ def clean(value):
     return re.sub(r"[\t\r\n]+", " ", str(value if value is not None else "")).strip()
 
 
-# The cells save_rows and append write as they are given. read_labels decides whether each holds a legal value, and
-# clean changes no legal value, so cleaning one could only make a cell that is not legal read as legal after a rewrite.
 KEPT_CELLS = {"rail.tsv": ("kind", "goal"), "dishes.tsv": ("kind", "goal"), "goals.tsv": ("id",)}
 
 

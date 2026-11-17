@@ -49,7 +49,6 @@ def setUpModule():
 class WorktreeAuditTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        # Git records the physical path, which the audit prints, so resolve the temporary root.
         self.root = Path(self.tmp.name).resolve()
         self.repo = self.root / "repo"
         self.repo.mkdir()
@@ -281,4 +280,3 @@ class WorktreeAuditTest(unittest.TestCase):
         self.assertIn("replaces those settings roots", text)
 
 
-# The runtime docs join in RUNTIME_DOCS order. Later items append to this tuple.

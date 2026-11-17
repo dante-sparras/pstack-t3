@@ -10,7 +10,6 @@ from tests import isolation
 
 isolation.install()
 
-# The count is git's own, and the exemption stays exact.
 from ..support import BrigadeTest, setUpModule
 from . import cap_refusal
 

@@ -41,9 +41,8 @@ class Recorder(unittest.TestResult):
         super().__init__()
         self.tests = tests
         self.emit = emit
-        self.reached = 0     # the index in tests of the first test the suite has not reached
+        self.reached = 0
         self.current = None
-        # The setUpClass and setUpModule fixtures that failed or skipped since the last test started. Each is the method, the name of its class or module, and whether it skipped.
         self.setups: list[tuple[str, str, bool]] = []
 
     def pass_over(self, index: int) -> None:
@@ -56,7 +55,6 @@ class Recorder(unittest.TestResult):
         self.reached, self.setups = index, []
 
     def startTest(self, test):
-        # The suite runs its tests in order, and one test object may sit at two positions.
         index = next(index for index in range(self.reached, len(self.tests)) if self.tests[index][0] is test)
         self.pass_over(index)
         self.reached = index + 1

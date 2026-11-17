@@ -26,8 +26,6 @@ from .support import (
 
 ALWAYS = "tests.test_pstack_t3"
 WORKFLOW = "tests.test_run_tests"
-# The exact layout pstack-t3 records, which reproduces the paragraph the picker printed before a store could
-# turn it off.
 LAYOUT = {
     "always": ALWAYS,
     "workflowModule": WORKFLOW,
@@ -232,7 +230,6 @@ class AffectedBase(BrigadeTest):
             else:
                 shutil.copy2(child, target)
         subprocess.run(["git", "init", "-q", "-b", "main"], cwd=dest, capture_output=True, text=True, check=True)
-        # Disable detached maintenance in this archive.
         subprocess.run(["git", "config", "maintenance.auto", "false"], cwd=dest, capture_output=True, text=True, check=True)
         subprocess.run(["git", "config", "gc.auto", "0"], cwd=dest, capture_output=True, text=True, check=True)
         subprocess.run(["git", "-c", "gc.auto=0", "-c", "maintenance.auto=false", "add", "-A"],
@@ -246,7 +243,6 @@ class AffectedBase(BrigadeTest):
         import importlib
         import sys
         scripts = str(ROOT / "t3/added/brigade/scripts")
-        # Another test module in this worker can leave the path behind, so add it only when it is absent.
         if scripts not in sys.path:
             sys.path.insert(0, scripts)
             self.addCleanup(sys.path.remove, scripts)

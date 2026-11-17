@@ -25,7 +25,6 @@ else:
 
 NOFOLLOW = getattr(os, "O_NOFOLLOW", 0)
 
-# Windows CreateFile arguments: read attributes only, share read, write and delete, open the reparse point itself.
 _READ_ATTRIBUTES = 0x80
 _SHARE_ALL = 0x7
 _OPEN_EXISTING = 3
@@ -105,10 +104,8 @@ def identity(info):
 if WINDOWS:
     HOLD_FLAGS = 0
 elif hasattr(os, "O_PATH"):
-    # Linux opens the entry itself with O_PATH.
     HOLD_FLAGS = os.O_PATH | os.O_NOFOLLOW
 else:
-    # macOS opens a symlink itself with O_SYMLINK, and O_NONBLOCK keeps a FIFO from blocking.
     HOLD_FLAGS = os.O_RDONLY | getattr(os, "O_SYMLINK", os.O_NOFOLLOW) | os.O_NONBLOCK
 
 

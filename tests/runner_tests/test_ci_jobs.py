@@ -58,10 +58,8 @@ from .workflow import (
 
 MACOS_PRIVATE_ROOTS = ("/tmp", "/var", "/etc")
 
-# 22 run root, 16 browser temp dir, 45 socket suffix (reports/D7.md in the brigade store).
 SELECT_BROWSER_SOCKET_OFFSET = 22 + 16 + 45
 
-# 1 + 10 + pid + 1 + 8 scratch name, 5 shard home, 4 worker TMPDIR, 12 browser temp dir, 45 suffix (reports/D7.md in the brigade store).
 WORKER_SOCKET_OFFSET = 1 + 10 + 7 + 1 + 8 + 5 + 4 + 12 + 45
 
 GENERATED_RUN = (

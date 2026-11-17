@@ -114,7 +114,6 @@ class RendererTest(NodeRender, OutputCase):
     def test_hostile_seat_is_escaped_in_the_document_and_drawn_as_text(self):
         fixture = one_running(self.fixture).write()
         stamp = fixture.stamp(10)
-        # A tab would split this cell. The seat keeps HOSTILE with that tab written as a space.
         write_threads(fixture, [
             {"at": stamp, "dish": "D7", "attempt": "1", "role": "verifier", "thread": worker(2),
              "seat": HOSTILE.replace("\t", " "), "start": stamp, "end": stamp},
@@ -177,7 +176,6 @@ class RendererTest(NodeRender, OutputCase):
         at = [index for index, item in enumerate(data["I"]) if item[0] == "D7"][0]
         self.assertIn("g" + str(at), built["ids"])
         self.assertIn(["A", "#g" + str(at), None, None], built["links"])
-        # The Timeline header is the only place D7's summary stays; its anchored chip drops it.
         self.assertEqual(built["texts"].count("Agent activity page"), 1)
     def test_running_now_names_no_model_of_the_store(self):
         failed_child(self.fixture).write()

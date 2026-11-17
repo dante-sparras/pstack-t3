@@ -32,7 +32,6 @@ def in_reports(restaurant, report, name):
     return report in (name, f"reports/{name}") or Path(report).parent.resolve() == restaurant.dir.resolve() / "reports"
 
 
-# What reports/<name> is when it is not a regular file of this store. Each value finishes the words `reports/<name> `.
 NOT_A_REPORT = {
     "link": "is a symbolic link",
     "missing": "does not exist",

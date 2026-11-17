@@ -47,7 +47,6 @@ class LaunchTest(unittest.TestCase):
         for name, argv in ENTRIES.items():
             with self.subTest(name):
                 if name == "runner" and os.environ.get("PSTACK_RUN_TESTS") == str(AREA):
-                    # The runner started on this area refuses to start itself again, and the run already proves this case.
                     continue
                 scratch = Path(tempfile.mkdtemp(prefix="launch-"))
                 self.addCleanup(shutil.rmtree, scratch, True)

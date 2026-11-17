@@ -73,7 +73,6 @@ def plan_install(view, scope, user, selected, names, root, replace):
                             adopted += 1
                         steps.append(Step("record", path, harnesses=union, add_claims=((path, union),), adopted=not record.claim_paths))
                 continue
-            # Moving a path that is this checkout's own skill directory would relocate the checkout.
             if layout.inside_checkout(path):
                 continue
             if os.path.lexists(path):
@@ -142,7 +141,6 @@ def plan_uninstall(view, root, selected, holds):
             consumers.append(Step("unlink", record.path))
             uncovered.add(slot)
         steps.extend(consumers)
-        # A live entry over a withdrawn top backup covered this link; any other live entry is a repoint.
         consumed = unlinks or not os.path.lexists(record.path) or bool(rows and rows[-1].backup in withdrawn)
         if not consumers or not consumed:
             kept += len(record.claim_paths)

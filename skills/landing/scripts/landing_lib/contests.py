@@ -100,7 +100,6 @@ def settle_contest(store, db, number, first):
             return settled
         raise seam.LandError(f"C{number} is done: {row['first']} landed")
     if row["first"] and row["first"] != first:
-        # An open PR can merge on its own, so an order that has started cannot be reversed.
         started = db.execute("SELECT * FROM entry WHERE holder = ? AND state IN ('landing', 'awaiting-merge') ORDER BY id LIMIT 1",
                              (row["first"],)).fetchone()
         if started:

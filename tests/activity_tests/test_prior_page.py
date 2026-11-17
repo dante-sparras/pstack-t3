@@ -52,8 +52,6 @@ class PriorPageTest(OutputCase):
         fixture = one_running(self.fixture).write()
         self.assertEqual([len(line.split("\t")) for line in (fixture.store / "dishes.tsv").read_text().splitlines()], [15, 15, 15])
         self.assertFalse((fixture.store / "goals.tsv").exists())
-        # The style and script differ from the prior build. The data element holds the values the page builds its
-        # strings from, not every drawn string, so this compares those values only, except P and the lane colors which now come from models.
         html = fixture.stdout_bytes()
         current = json.loads(DATA.search(html.decode()).group(1))
         prior = json.loads(DATA.search(frozen_bytes(script, fixture).decode()).group(1))

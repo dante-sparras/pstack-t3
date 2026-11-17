@@ -112,7 +112,6 @@ class RunTest(ReleaseCase):
     def test_changelog_without_a_heading_takes_the_section_at_the_end(self):
         with repository("# Changelog\n") as repo:
             commit(repo, {"changes/a.md": "- a\n"}, day=2)
-            # A changelog with no released version takes the version as it is given.
             self.assertEqual(run(repo, "0.3.0").returncode, 0)
             self.assertEqual((repo / "CHANGELOG.md").read_text(),
                              "# Changelog\n\n## 0.3.0 (2026-10-09)\n\n" + UPKEEP + "- a\n")

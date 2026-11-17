@@ -148,7 +148,6 @@ def drive(script, argv, *, env, cwd=None):
         return connection
 
     try:
-        # Collect cyclic garbage before this run opens land.db.
         gc.collect()
         out_raw, out = _capture_stream(False, *stdout_codec)
         err_raw, err = _capture_stream(True, *stderr_codec)

@@ -136,7 +136,6 @@ def counted(hidden, cuts, unlisted):
     cut, gone_items, gone_agents = 0, 0, 0
     for group, rows in cuts:
         lost = agents_in(group.rows) - agents_in(rows or ())
-        # A cut group's item in flight is in page.items, so the strip lists it or cut_in_flight counts it. Any other item is counted here.
         if rows is None and group.item and not group.item.in_flight:
             gone_items, gone_agents = gone_items + 1, gone_agents + lost
         else:

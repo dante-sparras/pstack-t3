@@ -1,6 +1,4 @@
 ---- MODULE TwoPhase ----
-\* Lamport's two-phase commit, with one seeded bug: the transaction manager
-\* commits as soon as any resource manager has prepared, not all of them.
 CONSTANT RM
 
 VARIABLES rmState, tmState, tmPrepared, msgs
@@ -68,7 +66,6 @@ TPNext ==
 
 TPSpec == TPInit /\ [][TPNext]_vars
 
-\* No resource manager commits while another aborts.
 TCConsistent ==
   \A r1, r2 \in RM : ~ /\ rmState[r1] = "aborted"
                        /\ rmState[r2] = "committed"

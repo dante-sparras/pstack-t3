@@ -120,11 +120,6 @@ def _close_live_owners(numbers):
         return
     owners = []
     for obj in gc.get_objects():
-        # Call fileno only on known descriptor owners. A ctypes library resolves fileno as a C
-        # function when the loaded library exports that name, and calling glibc fileno with no FILE
-        # pointer can crash the process with SIGSEGV. A dead weakref proxy raises ReferenceError from the
-        # type check. An unrelated object can raise a BaseException such as SystemExit.
-        # Both are skipped. KeyboardInterrupt propagates.
         try:
             if not isinstance(obj, (io.IOBase, socket.socket)):
                 continue
@@ -160,7 +155,6 @@ def _close_live_owners(numbers):
             steps += 1
         return steps
 
-    # Deepest first, so the wrapper flushes its buffer before the raw file closes.
     owners.sort(key=depth, reverse=True)
     for obj in owners:
         try:
@@ -237,7 +231,6 @@ def _restore(saved):
 
     step(signals)
     step(lambda: setattr(sys, "dont_write_bytecode", saved.dont_write_bytecode))
-    # Collect unreachable connections so their descriptors close before os.close.
     step(gc.collect)
     step(lambda: _close_new_fds(saved.fds))
     if first is not None:

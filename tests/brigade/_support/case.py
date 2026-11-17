@@ -21,9 +21,7 @@ class CaseBase:
     def setUp(self):
         self.addCleanup(_drop_entry, self)
         self.temporary = tempfile.TemporaryDirectory()
-        # Cleanups run last registered first, so this one runs after every holder a test leaves running is stopped.
         self.addCleanup(self.temporary.cleanup)
-        # The product resolves the project root, so the fixture paths below come from one resolved root.
         self.root = Path(self.temporary.name).resolve()
         self.store = self.root / "store"
         self.project = self.root / "Bridge Kit"
@@ -106,7 +104,6 @@ class CaseBase:
 
 
     def bash_unblocked(self, directory, line):
-        # The assertion is the shell round trip.
         command = line.split("run ", 1)[1]
         invocation = " ".join([shlex.quote(sys.executable), shlex.quote(str(SCRIPT)),
                                "--store", shlex.quote(str(self.store)), "--at", shlex.quote(str(directory)),

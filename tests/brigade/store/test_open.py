@@ -54,7 +54,6 @@ class OpenMixin:
         self.at.mkdir(parents=True)
         path = self.at / "restaurant.json"
         path.write_text('{"restaurant":')
-        # race between two processes
         proc = real_popen(
             ProcessReason.RACE,
             [sys.executable, str(SCRIPT), "--store", str(self.store), "open",
@@ -204,7 +203,6 @@ class OpenMixin:
         directory = self.store / "app" / "docs"
         procs = []
         for root in roots:
-            # race between two processes
             procs.append(real_popen(
                 ProcessReason.RACE,
                 [sys.executable, str(SCRIPT), "--store", str(self.store),

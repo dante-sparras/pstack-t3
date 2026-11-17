@@ -96,7 +96,6 @@ class Item:
     pr: str
     in_flight: bool
     no_link: str = ""
-    # The work item's position among the store's work items, so two work items that print alike stay two. No form prints it.
     key: int = 0
     kind: str = ""
     goal: str = ""

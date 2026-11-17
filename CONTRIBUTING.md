@@ -4,7 +4,7 @@ Issues and pull requests are welcome.
 
 ## Where changes go
 
-- **A skill behaves wrong in T3.** Change its port in `t3/overrides/`, or `t3/runtime.md` if the problem is how pstack maps onto T3's tools. Never edit `skills/` or `vendor/` by hand. `skills/` is generated, and `vendor/pstack` must stay byte-identical to upstream.
+- **A skill behaves wrong in T3.** Change its port in `t3/overrides/`, or `t3/runtime.md` if the problem is how pstack maps onto T3's tools. Never edit `skills/` or `vendor/` by hand. `skills/` is generated, and `vendor/pstack` must stay identical to upstream with its code comments deleted.
 - **The engineering content itself (a playbook step, a principle, a rubric).** That belongs upstream in [cursor/plugins](https://github.com/cursor/plugins/tree/main/pstack). pstack-t3 picks it up on the next sync.
 - **Installer or roles resolver.** `scripts/install.py` and `t3/scripts/roles.py`, with a test in `tests/`.
 

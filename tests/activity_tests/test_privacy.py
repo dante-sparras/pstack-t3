@@ -181,7 +181,6 @@ class PrivacyTest(OutputCase):
                 fixture.unit("left_homemarker", "in-progress", f"see left_homemarker{between}right_homemarker now", thread=spaced)
                 fixture.thread(spaced, title="right_homemarker", model="left_homemarker", turns=(("running", 9, None),))
                 fixture.thread(delegated(spaced, "helper-task"), title="right_homemarker", model="right_homemarker", parent=spaced, turns=(("running", 8, None),))
-                # read_store refuses a name that holds a NUL character.
                 fixture.meta["restaurant"] = f"left_homemarker{between.replace(chr(0), chr(27))}right_homemarker kit"
                 fixture.write()
                 document, text = self.document(), self.out("--text")

@@ -126,12 +126,6 @@ class LandingTest(SlotBase, LandingTestBase):
 
     @unittest.skipUnless(os.path.isdir("/proc"), "the test reads a zombie state from /proc")
     def test_a_signal_between_the_group_sigterm_and_the_grace_kills_the_group_at_once(self):
-        # The test starts a supervisor process to send it a signal and read its exit status. Its
-        # wrapper stops the supervisor right after the supervisor's SIGTERM to the group. The
-        # test waits for the leader's zombie, sends SIGHUP, and resumes the supervisor, which
-        # must exit with the signal status within 10s, one third of the 30s grace. A supervisor
-        # that lets the signal escape the interval runs the grace a second time and exits one
-        # grace later.
         self.governor(1)
 
         parent_path, child_path = self.base / "term-gap-parent.pid", self.base / "term-gap-child.pid"

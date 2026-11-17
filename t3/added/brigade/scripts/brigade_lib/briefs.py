@@ -67,7 +67,6 @@ class ModeLines:
     escalation: str
 
 
-# A full-send brief resolves no mode, because its method and seats come from full_send.
 NO_MODE = ModeLines((), "", None)
 
 

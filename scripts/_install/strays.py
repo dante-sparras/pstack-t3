@@ -55,7 +55,6 @@ def contested_by(backup):
 def held_beside(backup):
     """Return the path of an entry named os.path.basename(backup) in a HOLDER directory in os.path.dirname(backup), or None."""
     parent, name = os.path.split(backup)
-    # os.listdir raises ValueError for a path that holds a NUL byte.
     with suppress(ValueError):
         for _holder, directory in moves.holders(parent):
             aside = os.path.join(directory, name)
@@ -125,14 +124,12 @@ def prune(state, backup):
     if place is not None:
         empty_out(state, *place)
         return
-    # tempfile.mkdtemp returns an absolute path from Python 3.12 on, so a row can hold that spelling of a state path given relative or with "..".
     try:
         spelled = os.path.abspath(state)
     except OSError:
         return
     place = backup_place(spelled, backup)
     if place is not None:
-        # abspath removes ".." as text and the system applies it after following a symlink, so the two spellings can name two directories.
         empty_out_matched(state, spelled, *place)
 
 def empty_out(state, stamp, harness=None):
@@ -147,7 +144,6 @@ def empty_out(state, stamp, harness=None):
         if not system.is_link(backups) and not system.is_link(inner):
             system.remove_empty_dirs(([os.path.join(inner, harness)] if harness is not None else []) + [inner])
         return
-    # O_NOFOLLOW refuses a symlink at backups/ or <stamp>, and rmdir refuses a symlink, a file, and a directory that holds anything.
     flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
     with suppress(OSError, ValueError):
         top = os.open(os.path.join(str(state), "backups"), flags)
@@ -242,7 +238,6 @@ def settle(strays, state, root, dry_run):
             print(f"left {stray.path}: {error}")
     if not dry_run:
         for holder in sorted({os.path.dirname(stray.path) for stray in strays if stray.kind != "empty"}):
-            # rmdir refuses a directory that is not empty, so an entry that was left stays.
             with suppress(OSError):
                 os.rmdir(holder)
         for backup in dropped:

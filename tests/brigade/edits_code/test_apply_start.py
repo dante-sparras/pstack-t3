@@ -21,7 +21,6 @@ from . import test_apply
 
 
 class ApplyStartTest(BrigadeTest):
-    # Helpers come from ApplyTest by reference. Subclassing it would run its tests a second time here.
     git = test_apply.ApplyTest.git
     worktrees = test_apply.ApplyTest.worktrees
     branches = test_apply.ApplyTest.branches
@@ -44,7 +43,6 @@ class ApplyStartTest(BrigadeTest):
                                                   *_owner_words(self.at), "edits", "apply", *args])
 
     def test_apply_cleans_up_after_a_worktree_add_that_cannot_start_fails_when_the_new_branch_is_left(self):
-        # Processes: git builds the fixture project; edits apply runs in this process while starting git worktree add fails.
         self.contract()
         reviewed = self.edits_store()
         self.one_edit()
@@ -67,7 +65,6 @@ class ApplyStartTest(BrigadeTest):
                 self.assertEqual(temp_dirs(), before_temp)
 
     def test_apply_names_a_branch_it_cannot_remove_fails_when_cleanup_is_silent_about_it(self):
-        # Processes: git builds the fixture project; edits apply runs in this process and git cannot start after the branch exists.
         self.contract()
         reviewed = self.edits_store()
         self.one_edit()
@@ -91,7 +88,6 @@ class ApplyStartTest(BrigadeTest):
         self.assertIn(branch, "".join(self.branches()))
 
     def test_apply_removes_its_temporary_directory_fails_when_git_branch_cannot_start(self):
-        # Processes: git builds the fixture project; edits apply runs in this process while starting git branch fails.
         self.contract()
         reviewed = self.edits_store()
         self.one_edit()

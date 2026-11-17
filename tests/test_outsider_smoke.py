@@ -219,8 +219,6 @@ def _t3_inside_fence(text):
 
 class OutsiderSmokeTest(unittest.TestCase):
     def test_every_step_runs_against_the_home_the_script_made(self):
-        # The script starts one process per step because the check is the environment that process
-        # inherits and that process's exit status.
         with tempfile.TemporaryDirectory() as canary, tempfile.TemporaryDirectory() as tmpdir:
             (Path(canary) / CANARY).write_text("keep\n")
             before = listing(Path(canary))
@@ -249,8 +247,6 @@ class OutsiderSmokeTest(unittest.TestCase):
             self.assertEqual(listing(Path(canary)), before)
 
     def test_inherited_git_overrides_cannot_reach_the_canary_home(self):
-        # Review D306 round 1: an inherited GIT_INDEX_FILE, GIT_TRACE, or GIT_CONFIG_SYSTEM let Git
-        # write or read outside the home this run made.
         with tempfile.TemporaryDirectory() as canary, tempfile.TemporaryDirectory() as tmpdir:
             (Path(canary) / CANARY).write_text("keep\n")
             (Path(canary) / "system-config").write_text("not a git configuration line\n")
@@ -267,10 +263,6 @@ class OutsiderSmokeTest(unittest.TestCase):
             self.assertEqual(listing(Path(canary)), before)
 
     def test_inherited_python_startup_overrides_cannot_reach_the_canary_home(self):
-        # Review D306 round 2 shows startup overrides escape the created home.
-        # The canary holds a cache directory, a comment only .pth file, and a docstring only site customization.
-        # The run stays in this process so recorded child output is the observer.
-        # The old code inherits PYTHONVERBOSE. The new code drops that variable.
         with tempfile.TemporaryDirectory() as canary, tempfile.TemporaryDirectory() as tmpdir:
             (Path(canary) / CANARY).write_text("keep\n")
             (Path(canary) / "python-cache").mkdir()

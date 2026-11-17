@@ -25,7 +25,6 @@ class RequestsMixin:
         line = "from-user docs: add a FAQ"
         self.assertEqual(self.admin("request", "--to", "docs", line), "A1 for docs; tell thread th-docs")
         self.assertEqual(self.inbox("docs"), ["A1.line"])
-        # A failed send leaves the file. The coordinator's next wake prints it again.
         for _ in range(2):
             self.assertEqual(self.brigade("docs", "inbox", "take"), f"A1: {line}")
         self.assertIn("requests from the executive admin: 1", self.brigade("docs", "status"))

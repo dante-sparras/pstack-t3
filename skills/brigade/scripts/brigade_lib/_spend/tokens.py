@@ -249,13 +249,11 @@ def _turn_totals(rows, model):
     incoming = cache_read = cache_write = outgoing = reasoning_total = 0
     for row in rows:
         status, values, kinds = row[0], row[1:6], row[6:12]
-        # json_extract turns JSON true into 1, so only a JSON integer counts.
         if kinds[0] != "text" or status != "complete" or any(kind != "integer" for kind in kinds[1:]):
             return None
         if any(type(value) is not int or value < 0 for value in values):
             return None
         fresh, cached, created, output, reasoning = values
-        # Claude input_tokens already excludes cache. T3 inputTokens includes it.
         fresh -= cached + created
         if fresh < 0:
             return None

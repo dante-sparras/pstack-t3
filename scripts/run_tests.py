@@ -106,9 +106,6 @@ from _run_tests import parse_part, positive, processes
 
 ROOT = Path(__file__).resolve().parents[1]
 
-# Loaded by path, not as tests.isolation. A `tests` package on sys.path or in sys.modules shadows a
-# fixture tree that imports its own top-level tests package, which is a shape the runner must support.
-# Registered before it runs, so a later import of tests.isolation gets this copy and the process holds one guard.
 isolation = sys.modules.get("pstack_test_isolation")
 if isolation is None:
     _loader = spec_from_file_location("pstack_test_isolation", ROOT / "tests" / "isolation.py")
@@ -116,7 +113,6 @@ if isolation is None:
     sys.modules["pstack_test_isolation"] = isolation
     _loader.loader.exec_module(isolation)
 
-# Record the visible protected roots, and the roots the pointer's marker carries, before rewriting any child environment.
 isolation.remember_originals()
 
 _original_child_env = processes.child_env
@@ -270,8 +266,6 @@ def main(argv: list[str] | None = None) -> int:
     from _run_tests import main as _pkg_main
 
     if _child(sys.argv[1:] if argv is None else argv):
-        # The listing child and every worker import test modules, so each installs and verifies the guard
-        # before discovery. A failed install raises SystemExit, which exits nonzero.
         isolation.install()
     return _pkg_main(argv, __doc__)
 

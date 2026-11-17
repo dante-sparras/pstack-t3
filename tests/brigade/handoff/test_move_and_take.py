@@ -77,7 +77,6 @@ class MoveTakeMixin:
         self.brigade("core", "set", "--thread", "t1")
         self.brigade("core", "ticket", "add", "--kind", "fix", "--summary", "Fix the cache", "--source", "github", "--ref", "R7")
         self.brigade("core", "ticket", "move", "T1", "--to", "engine")
-        # The handoff was never delivered, so a rerun of the move would publish it again.
         (self.dir("engine") / "inbox" / "app~core~T1.json").unlink()
         stale = self.paused("stale", "core", "--owner", "t1@1", "ticket", "move", "T1", "--to", "engine")
         missing = self.paused("missing", "core", "ticket", "move", "T1", "--to", "engine")
@@ -96,7 +95,6 @@ class MoveTakeMixin:
         self.brigade("engine", "set", "--thread", "e1")
         handed = inbox.read_bytes()
         self.assertEqual(self.brigade("engine", "--owner", "e1@1", "ticket", "take"), "T1 from app/core/T1: Fix the cache")
-        # A take that filed the ticket and died before deleting the file leaves exactly this.
         inbox.write_bytes(handed)
         stale = self.paused("stale", "engine", "--owner", "e1@1", "ticket", "take")
         missing = self.paused("missing", "engine", "ticket", "take")

@@ -79,6 +79,6 @@ flowchart LR
     install --> dirs["~/.claude/skills  ~/.agents/skills<br/>~/.grok/skills  ~/.cursor/skills<br/>~/.config/opencode/skills"]
 ```
 
-- `vendor/pstack` stays byte-identical to the upstream commit in [`upstream.json`](../upstream.json).
+- `vendor/pstack` stays identical to the upstream commit in [`upstream.json`](../upstream.json), except that the sync deletes its code comments.
 - `t3/overrides/` replaces individual upstream files. A lock file records which upstream version each override came from, so a newer upstream flags exactly the files that need re-porting.
 - The build fails if any installed file still mentions a Cursor-only mechanism, such as `subagent_type`, `/loop`, or a hard-coded Cursor model slug.

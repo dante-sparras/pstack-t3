@@ -67,7 +67,6 @@ class ContractCheckCommandTest(BrigadeTest):
         shutil.copyfile(scratch / "land.db-wal", f"{path}-wal")
 
     def test_affected_names_the_contract_check_when_the_store_records_no_check_fails_when_the_store_alone_is_read(self):
-        # Processes: git and land build the fixture project and its contract.
         self.contract(self.CONTRACT_CHECK)
         self.open()
         out = self.affected()
@@ -75,7 +74,6 @@ class ContractCheckCommandTest(BrigadeTest):
         self.assertNotIn("No verify command is set", out)
 
     def test_edits_verify_runs_its_contract_check_when_the_store_records_no_check_fails_when_the_store_alone_is_read(self):
-        # Processes: git and land build the fixture project and its contract; edits verify runs its tools' scripts.
         self.contract(self.CHECK_COMMAND)
         reviewed = self.edits_store()
         self.brigade("set", "--check-command", "")
@@ -88,7 +86,6 @@ class ContractCheckCommandTest(BrigadeTest):
         self.assertEqual(len(self.edits_rows()), 1)
 
     def test_a_stored_check_command_wins_over_the_contract_check_fails_when_the_contract_is_read_first(self):
-        # Processes: git and land build the fixture project and its contract.
         self.contract(self.CONTRACT_CHECK)
         self.open()
         self.brigade("set", "--check-command", "make test")
@@ -97,7 +94,6 @@ class ContractCheckCommandTest(BrigadeTest):
         self.assertNotIn(self.CONTRACT_CHECK, out)
 
     def test_a_stored_none_keeps_the_contract_check_unused_fails_when_an_unset_store_falls_back(self):
-        # Processes: git and land build the fixture project and its contract.
         self.contract(self.CONTRACT_CHECK)
         self.open()
         self.brigade("set", "--check-command", "none")
@@ -106,7 +102,6 @@ class ContractCheckCommandTest(BrigadeTest):
         self.assertNotIn(self.CONTRACT_CHECK, out)
 
     def test_edits_verify_keeps_the_store_check_over_the_contract_check_fails_when_the_contract_is_read_first(self):
-        # Processes: git and land build the fixture project and its contract; edits verify runs its tools' scripts.
         self.contract(self.failing_check())
         reviewed = self.edits_store()
         self.two_edits()
@@ -117,7 +112,6 @@ class ContractCheckCommandTest(BrigadeTest):
                              f"{self.verified(reviewed, head)}", ""))
 
     def test_no_check_in_the_store_or_the_contract_keeps_the_needs_commands_refusal_fails_when_an_empty_contract_is_taken_as_a_command(self):
-        # Processes: git and land build the fixture project and a contract holding no check.
         self.contract()
         reviewed = self.edits_store()
         self.brigade("set", "--check-command", "")
@@ -127,21 +121,18 @@ class ContractCheckCommandTest(BrigadeTest):
         self.assertEqual(self.verify(reviewed, head), (1, "", self.NEEDS_COMMANDS))
 
     def test_two_contract_checks_give_affected_no_command_fails_when_one_of_several_is_taken(self):
-        # Processes: git and land build the fixture project and a contract holding two checks.
         self.contract("make lint", "make test")
         self.open()
         out = self.affected()
         self.assertIn("No verify command is set", out)
 
     def test_a_contract_check_of_none_gives_affected_no_command_fails_when_the_word_none_is_supplied(self):
-        # Processes: git and land build the fixture project and a contract whose one check is the word none.
         self.contract("none")
         self.open()
         out = self.affected()
         self.assertIn("No verify command is set", out)
 
     def test_a_queue_with_a_committed_row_only_in_its_log_keeps_its_database_and_log_bytes_fails_when_the_open_is_read_write(self):
-        # Processes: git and land build the fixture project and its contract.
         self.contract(self.CONTRACT_CHECK)
         self.open()
         database = self.database()
@@ -157,7 +148,6 @@ class ContractCheckCommandTest(BrigadeTest):
         self.assertIn("No verify command is set", out)
 
     def test_a_lookup_without_a_matching_contract_leaves_a_live_queue_and_a_queue_with_no_index_alone_fails_when_every_candidate_is_opened_read_write(self):
-        # Processes: git builds this project and the two repositories that own the queues.
         self.git_project()
         self.landing_env()
         self.open()

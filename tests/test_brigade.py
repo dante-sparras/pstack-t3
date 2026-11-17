@@ -94,7 +94,6 @@ class SpendControlsTest(BrigadeTest):
         self.open()
         meta = json.loads(self.brigade("set", "--cap", "polish=1,study=2", "--review", "feature=full,fix=light"))
         self.assertEqual((meta["caps"], meta["review"]), ({"polish": 1, "study": 2}, {"feature": "full", "fix": "light"}))
-        # A second flag leaves the kinds it does not name as they were, and an empty value clears one kind.
         meta = json.loads(self.brigade("set", "--cap", "polish=", "--review", "fix="))
         self.assertEqual((meta["caps"], meta["review"]), ({"study": 2}, {"feature": "full"}))
         meta = json.loads(self.brigade("set", "--cap", "", "--review", ""))
@@ -179,7 +178,6 @@ class OpenFlagHelpTest(BrigadeTest):
                      "missing uses claude; an existing store uses its saved provider")
 
     def test_open_help_states_the_two_flags_take_effect_on_creation_only(self):
-        # -h output
         result = real_process(ProcessReason.HELP, SCRIPT, ["open", "--help"])
         self.assertEqual(result.returncode, 0, result.stderr)
         words = " ".join(result.stdout.split())
@@ -194,7 +192,6 @@ class SetContextCapHelpTest(BrigadeTest):
                 'when the provider is claude; "" clears it to 300000')
 
     def test_set_help_states_the_window_path_and_the_empty_value_that_clears_to_300000(self):
-        # --help output
         result = real_process(ProcessReason.HELP, SCRIPT, ["set", "--help"])
         self.assertEqual(result.returncode, 0, result.stderr)
         words = " ".join(result.stdout.split())
@@ -228,7 +225,6 @@ class ReleaseSectionsTest(unittest.TestCase):
         with self.repository() as repo:
             commit(repo, {"CHANGELOG.md": CHANGELOG})
             commit(repo, FRAGMENTS)
-            # A feature in the release takes the next minor with no patch, and no feature takes the next patch.
             refused = self.run_release(repo, "0.4.2", "--dry-run")
             self.assertEqual((refused.returncode, refused.stdout), (1, ""))
             self.assertEqual(refused.stderr, "0.4.2 is not 0.5.0, the version the kinds give; pass 0.5.0\n")

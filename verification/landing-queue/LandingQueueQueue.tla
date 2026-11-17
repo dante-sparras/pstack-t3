@@ -1,13 +1,7 @@
 ---- MODULE LandingQueueQueue ----
-\* Moved from LandingQueue.tla unchanged: Submit, the drain, and the environment.
 EXTENDS LandingQueueLeases
 
-\* ---------------------------------------------------------------------------
-\* Submit.
-\* ---------------------------------------------------------------------------
 
-\* A new entry, or a bounced entry resubmitted by its holder. The old row goes
-\* and a new row comes in the same transaction.
 Submit(e, l, g) ==
   /\ entryState[e] \in {"none", "bounced"}
   /\ entryState[e] = "bounced" => leaseHolder[l] = leaseHolder[entryLease[e]]
@@ -23,19 +17,11 @@ Submit(e, l, g) ==
                  landedAs, drainVars, tip, forgeVars, checkedAt, publishes,
                  droppedCoverage, trunkRewound, uncheckedMerge>>
 
-\* `already <state>`. Nothing changes, and the view folds it into its own state.
 SubmitDuplicate(e) ==
   /\ entryState[e] \notin {"none", "bounced"}
   /\ UNCHANGED <<leaseVars, clock, floor, entryVars, drainVars, tip, forgeVars, historyVars>>
 
-\* ---------------------------------------------------------------------------
-\* Drain, both modes.
-\* ---------------------------------------------------------------------------
 
-\* The flock. Break = two-integrators drops it. The model has one process, so
-\* that variant shows the lock is what refuses a second run, and explores no
-\* interleaving of two runs. Break = absence-counts-drains is the rule at the
-\* parent of pull request #474: a mark from an earlier drain counts as a repeat.
 DrainStart ==
   /\ ~paused
   /\ (Break = "two-integrators" \/ run.pc = "idle")
@@ -53,9 +39,6 @@ ReconcileFetch ==
   /\ UNCHANGED <<leaseVars, clock, floor, entryVars, attempt, worktree, paused,
                  secondDrain, tip, forgeVars, historyVars>>
 
-\* Asks git, through the fetch above, what happened to the interrupted push.
-\* Break = no-already-landed-check negates the answer: an attempt git says is
-\* on trunk is requeued, and one git says is not on trunk settles as landed.
 ReconcileAttempt ==
   LET e          == attempt.entry
       recognised == attempt.cand \in Ancestors(run.fetched)
@@ -71,7 +54,6 @@ ReconcileAttempt ==
           /\ UNCHANGED <<leaseVars>>
   /\ UNCHANGED <<clock, floor, run, worktree, paused, secondDrain, tip, forgeVars, historyVars>>
 
-\* The separate later transaction. Every `landing` entry goes back to queued.
 ReconcileLanding ==
   /\ run.pc = "fetched"
   /\ (attempt = NoAttempt \/ Break = "no-reconcile-attempt")
@@ -81,8 +63,6 @@ ReconcileLanding ==
   /\ UNCHANGED <<leaseVars, clock, floor, entryLease, landedAs, attempt, worktree,
                  paused, secondDrain, tip, forgeVars, historyVars>>
 
-\* `attempt` captures the base here, once, and passes it to `publish`. Merge
-\* mode's line holds one entry in this model, so the build waits for it.
 IntegrationReset ==
   /\ run.pc \in {"reconciled", "ready"}
   /\ \E e \in Entries : entryState[e] = "queued"
@@ -92,9 +72,6 @@ IntegrationReset ==
   /\ UNCHANGED <<leaseVars, clock, floor, entryVars, attempt, paused, secondDrain,
                  tip, forgeVars, historyVars>>
 
-\* One replay. It moves the worktree and writes no store row, so a Crash here
-\* leaves the worktree moved and the entry queued. The outcome is process state.
-\* The bounce outcome stands for a conflict or a fingerprint that differs.
 ApplyRun(e) ==
   LET held == EntryPrint(e) \in Tree(worktree) IN
   /\ run.pc = "based"
@@ -126,9 +103,6 @@ BounceApply ==
   /\ run' = IdleRun("ready")
   /\ UNCHANGED <<clock, floor, attempt, worktree, paused, secondDrain, tip, forgeVars, historyVars>>
 
-\* Publish mode records the candidate before the check. Merge mode's build runs
-\* the check straight after the replay, with no transaction between them.
-\* `checkedAt` holds the commit the entry's latest check passed on, or none.
 CheckRun ==
   /\ (run.pc = "recorded" \/ (Mode = "merge" /\ run.pc = "apply-ok"))
   /\ \/ /\ run' = [run EXCEPT !.pc = "check-pass"]
@@ -145,9 +119,6 @@ BounceCheck ==
   /\ run' = IdleRun("ready")
   /\ UNCHANGED <<clock, floor, attempt, worktree, paused, secondDrain, tip, forgeVars, historyVars>>
 
-\* ---------------------------------------------------------------------------
-\* The environment.
-\* ---------------------------------------------------------------------------
 
 OutsiderPush(c) ==
   /\ c \notin Squashes

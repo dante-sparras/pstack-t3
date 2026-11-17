@@ -120,7 +120,6 @@ def table(parser):
         required = action.required if action.option_strings else action.nargs in (None, "+")
         choices = ", ".join(f"`{choice}`" for choice in action.choices or ())
         default = action.default
-        # `is False`, because 0 == False and a default of 0 is worth showing.
         default = "" if default is None or default is False or default == "" or default == [] else f"`{default}`"
         rows.append(f"| {name} | {'yes' if required else ''} | {choices} | {default} | {text(action.help)} |")
     lines = ["| Argument | Required | Choices | Default | Help |", "| --- | --- | --- | --- | --- |", *rows, ""] if rows else []

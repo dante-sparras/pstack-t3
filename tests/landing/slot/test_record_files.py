@@ -73,8 +73,6 @@ class LandingTest(SlotBase, LandingTestBase):
 
     def test_a_locked_temporary_record_file_is_kept(self):
         self.governor(1)
-        # The pid comes from a process that has exited, so the name cannot collide with the pid this
-        # process publishes its own temporary file under.
         pid = self.dead_pid()
         live, descriptor = self.temporary_hold(pid, locked=True)
         try:
@@ -272,7 +270,6 @@ class LandingTest(SlotBase, LandingTestBase):
             self.land("lease", "claim", "--holder", "r/D1", "--paths", "a.txt")
             self.land("submit", "--holder", "r/D1", "--branch", "w1", "--sha", sha, "--lease", "L1",
                       "--reviewer", REVIEWER)
-            # Read the store's tables with no search permission on the store itself, so a stat inside it fails.
             store = self.base / "state/pstack-t3/brigade/proj/store"
             os.chmod(store, 0o444)
             try:

@@ -52,7 +52,6 @@ class ReplaySetupTest(BrigadeTest):
         return f"{shlex.quote(sys.executable)} tools/build.py"
 
     def test_setup_runs_before_the_build_in_the_replay_copy_fails_when_the_build_sees_no_setup_output(self):
-        # Processes: git and land build the fixture project and its contract; edits verify runs its setup and build scripts.
         """Fails at the base, where the setup never runs and the build exits 5."""
         setup = self.setup_command()
         self.contract(setup)
@@ -68,7 +67,6 @@ class ReplaySetupTest(BrigadeTest):
         self.assertFalse((self.project / "deps").exists())
 
     def test_a_failing_setup_stops_the_verify_with_one_line_fails_when_the_build_runs_after_a_failed_setup(self):
-        # Processes: git and land build the fixture project and its contract; edits verify runs its setup script.
         """Fails at the base, where the setup never runs and the build and check pass."""
         setup = self.setup_command()
         self.contract(setup)
@@ -83,7 +81,6 @@ class ReplaySetupTest(BrigadeTest):
         self.assertFalse((self.project / "setup-touched.txt").exists())
 
     def test_a_setup_that_changes_a_tracked_path_stops_the_verify_fails_when_setup_output_is_left_in_the_copy(self):
-        # Processes: git and land build the fixture project and its contract; edits verify runs its setup script.
         """Fails at the base, where the setup never runs and the build and check pass."""
         setup = self.setup_command()
         self.contract(setup)
@@ -97,7 +94,6 @@ class ReplaySetupTest(BrigadeTest):
         self.assertEqual(self.edits_rows(), [])
 
     def test_no_setup_command_keeps_the_lines_a_contract_without_setup_produced_before_this_change(self):
-        # Processes: git and land build the fixture project and its contract; edits verify runs its tools' scripts.
         """Passes at the base by design, because a contract without setup keeps unchanged behavior."""
         self.contract()
         reviewed = self.edits_store()

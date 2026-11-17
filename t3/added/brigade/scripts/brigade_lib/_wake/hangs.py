@@ -61,7 +61,6 @@ def record_hang(restaurant, ident, provider, minutes, attempt=None):
     current = len(starts)
     if attempt is not None and not 1 <= attempt <= current:
         raise BrigadeError(f"{ident} has attempts 1 to {current}")
-    # An earlier attempt was replaced, so only the current one waits for its report-back.
     if attempt in (None, current) and dish.get("reported") != "yes":
         earlier = f"; for a run left open by an earlier attempt, pass --attempt {'1' if current == 2 else f'1 to {current - 1}'}"
         raise BrigadeError("no report-back on this attempt" + (earlier if current > 1 else ""))

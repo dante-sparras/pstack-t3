@@ -34,7 +34,6 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 
 
-# Persona and playbook roots resolve from this facade's location.
 AGENTS_DIR = Path(__file__).resolve().parents[1] / "agents"
 TREE_ROOT = Path(__file__).resolve().parents[2]
 
@@ -104,7 +103,6 @@ def _drop_cached_roles(*names):
 _prior_roles = {n: m for n, m in _sys.modules.items() if n == "_roles" or n.startswith("_roles.")}
 _drop_cached_roles("_roles")
 _pkg = "_roles_ns_" + _uuid.uuid4().hex
-# The alias keeps a unique name so seam metadata cannot resolve to a restored prior package.
 _alias = _types.ModuleType(_pkg)
 _alias.__path__ = [str(_libdir)]
 _sys.modules[_pkg] = _alias
@@ -153,7 +151,6 @@ def main(argv=None):
     write.add_argument("--budget", choices=list(BUDGETS))
     write.add_argument("--mode", choices=MODES)
     group = write.add_mutually_exclusive_group()
-    # None means the flag was omitted. An empty list would replace a stored project list.
     group.add_argument("--escalate", action="append", default=None)
     group.add_argument("--clear-escalate", action="store_true")
     write.add_argument("--set", action="append", help="'<role>=<seat>[;<seat>]', seat = inherit | provider/model[?option=value]")

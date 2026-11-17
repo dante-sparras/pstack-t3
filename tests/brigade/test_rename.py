@@ -202,8 +202,6 @@ class RenameTest(BrigadeTest):
             _wait_for_path(self.case / "recovered")
             opener = self.open_child()
             _wait_for_path(self.case / "started")
-            # Review 3's ordering: the opener starts before the rerun's own mkdir. The project lock holds the
-            # opener at its claim until the rerun creates the target and moves the store onto it.
             deadline = time.monotonic() + 3
             while not (self.at.parent / "speed").exists() and time.monotonic() < deadline:
                 time.sleep(0.005)

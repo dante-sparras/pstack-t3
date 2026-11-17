@@ -70,12 +70,10 @@ class Restaurant:
         if owner is not None and not re.fullmatch(r".*@\d+", owner):
             raise BrigadeError(f"--owner takes <thread>@<generation>, got {owner!r}")
         self.owner = owner
-        # set --thread changes the owner, so it alone writes without matching the recorded one.
         self.unfenced = False
         self._lock_fd = None
         self._lock_depth = 0
         self._read_depth = 0
-        # The warning texts this command has printed. One command makes one Restaurant for its own store.
         self.warned = set()
 
     def warn(self, text):
@@ -275,7 +273,6 @@ class Restaurant:
             try:
                 end = os.fstat(fd).st_size
                 if end and os.pread(fd, 1, end - 1) != b"\n":
-                    # A killed append left an unfinished tail. Writing after it would join two rows.
                     end = os.pread(fd, end, 0).rfind(b"\n") + 1
                     os.ftruncate(fd, end)
                 written = os.write(fd, data)

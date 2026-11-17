@@ -102,9 +102,7 @@ def badge_findings(readme, upstream):
     return [f"README.md badge url {url} alt {alt} disagrees with upstream.json version {pin}"]
 
 
-# `doctor` prints `{installed}/{expected} pstack-t3` for one harness.
 _QUOTED_COUNT = re.compile(r"(\d+)/(\d+) pstack-t3")
-# README states how many skills its link to docs/skills.md covers.
 _STATED_COUNT = re.compile(r"\ball (\d+) skills\b")
 
 
@@ -176,10 +174,7 @@ def readme_count_findings(readme, root):
     return findings
 
 
-# The setup gate string in REQUIRED_TOOLS names the minimum T3 Code version.
 _GATE_MINIMUM = re.compile(r"T3 Code (" + _VERSION_TOKEN + r") or later")
-# A document states the minimum with T3 Code, an optional Markdown link, the version in
-# optional backticks, then "or later", the shape README.md and docs/guide.md use.
 _NAMED_MINIMUM = re.compile(
     r"T3 Code(?:\]\([^)\n]*\))?\s+`?(" + _VERSION_TOKEN + r")`?\s+or later\b"
 )

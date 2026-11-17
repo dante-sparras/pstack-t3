@@ -18,7 +18,6 @@ RENAME_NOREPLACE = 1
 
 AT_FDCWD = -100
 
-# Darwin renamex_np flag from stdio.
 RENAME_EXCL = 0x00000004
 
 def rename_noreplace(source, target):
@@ -57,15 +56,12 @@ def place(source, path):
     Once the link worked the entry is at `path`, so a source that is gone has no name left to remove.
     """
     try:
-        # A hard link of the link itself fails on a taken path, where a rename would replace it.
         os.link(source, path, follow_symlinks=False)
     except FileExistsError:
         return errno.EEXIST
     except (OSError, NotImplementedError) as error:
-        # A rename cannot cross a filesystem that a hard link cannot.
         if getattr(error, "errno", None) == errno.EXDEV:
             return errno.EXDEV
-        # A directory cannot be hard linked. A plain rename would replace whatever took the path since.
         return rename_noreplace(source, path)
     with suppress(FileNotFoundError):
         os.unlink(source)
@@ -165,9 +161,6 @@ class Holder:
 
     def __init__(self, home, prefix=HOLDER):
         parent, name = os.path.split(home)
-        # A directory this call just created holds nothing yet, so a move into it cannot land on an existing entry.
-        # mkdtemp ends the name with characters from [a-z0-9_], so no HOLDER name starts with SCRAP or STRANGER
-        # and no SCRAP name starts with STRANGER.
         self.directory = made_directory(parent, prefix)
         self.home = home
         self.aside = PrivateName(os.path.join(self.directory, name))
@@ -190,7 +183,6 @@ def remove_link(path, root, original, noun):
     """Move the link at `path` aside, then delete it only if it is this checkout's link for `original`. Return why it was kept."""
     with Holder(path) as holder:
         aside = holder.aside
-        # Another installer can replace the link after the plan proved it. The rename takes whatever is there now.
         os.rename(path, aside)
         if layout.proves(root, aside, original):
             os.unlink(aside)
@@ -233,9 +225,6 @@ def link_held(fd, path):
     if not sys.platform.startswith("linux"):
         return errno.ENOSYS
     try:
-        # The descriptor is the entry itself, whatever its old path names now.
-        # `src_dir_fd` makes Python call linkat, which follows the /proc link to that entry. Plain link would link the /proc entry itself and fail as a crossing.
-        # The source is an absolute path, so the descriptor passed there is never used as a directory.
         os.link(f"/proc/self/fd/{fd}", path, src_dir_fd=fd, follow_symlinks=True)
     except (OSError, NotImplementedError) as error:
         return getattr(error, "errno", None) or errno.ENOSYS

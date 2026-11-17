@@ -286,7 +286,7 @@ def main():
         try:
             mcp.tool("t3_thread_organize", {"action": "archive", "threadId": tid})
             done += 1
-        except Exception as error:  # report and continue with the rest
+        except Exception as error:
             failed += 1
             if failed <= 5:
                 print(f"failed: {str(error)[:200]}")

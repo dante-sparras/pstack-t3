@@ -87,14 +87,11 @@ def recovery_lines(dish, error):
     ident = dish["id"]
     branch = dish.get("branch") or ""
     context = shlex.quote(error)
-    # A brief needs a goal, an acceptance, a verify, a base, and a contract, so the line names them
-    # instead of a command brief refuses.
     steps = [f"  keep the commits on {shlex.quote(branch)} and record no new branch; the dish keeps its lease"
              if branch else "  keep the commits where the worker left them; the dish keeps its lease",
              f"  write the continuation brief: brief {ident} with --base <trunk ref>, --context {context}, "
              "and the goal, acceptance, verify, and contract it needs",
              f"  launch a fresh thread in the same worktree and record it with dish {ident} --thread <new thread id>"]
-    # The record needs a thread, but the cell can be cleared afterwards without starting another attempt.
     steps.append(f"  archive the dead thread {shlex.quote(dish['thread'])}" if dish["thread"]
                  else "  archive the dead worker")
     return [f"{ident}: worker ended with no report; the recorded reason is {error}", *steps]
@@ -125,7 +122,6 @@ def dish_progress(restaurant, dish, moment, held=False):
                 return [f"{dish['id']}: reported {ago}m ago, not in review; read the thread ({where})"]
             return [f"{dish['id']}: report written {ago}m ago; review it even if the worker's run is still open ({where})"]
         return [f"{dish['id']}: report written, no report-back ({where})"]
-    # A dead worker is neither running nor over its timebox, so its lines come before both.
     ended = ended_row(restaurant, dish)
     if ended:
         return recovery_lines(dish, ended["note"])

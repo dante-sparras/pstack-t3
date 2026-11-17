@@ -99,7 +99,6 @@ class BrigadeAdminSplitDocChecks:
 
     def test_a_section_of_the_other_skill_is_named_only_as_a_link(self):
         from tests.test_pstack_t3 import heading_slug
-        # "Terms", "The script", and "Run a service" also occur as plain words, so they are only required once.
         for section in ("Terms", "The script", "Run a service"):
             with self.subTest(section=section):
                 self.assertIn(f"[{section}](../brigade/SKILL.md#{heading_slug(section)})", self.admin)
@@ -186,7 +185,6 @@ class BrigadeAdminSplitDocChecks:
                 self.assertNotIn(phrase, self.admin)
 
     def test_admin_names_each_request_line_and_links_brigade_for_its_text(self):
-        # Any placeholder counts, so a line written with `<coordinator>` is still a second copy of the format.
         self.assertEqual(re.findall(r"`(?:ticket|from-user|answer|reports-to|ruling) <[^`]*`", self.admin), [])
         messages = self.admin.split("\n## Admin messages\n", 1)[1].split("\n## ", 1)[0]
         self.assertIn(

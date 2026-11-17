@@ -10,7 +10,6 @@ from tests import isolation
 
 isolation.install()
 
-# A binary file over the cap is refused by the every-line count.
 import os
 from unittest import mock
 

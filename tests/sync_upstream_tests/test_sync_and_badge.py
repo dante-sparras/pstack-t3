@@ -42,6 +42,19 @@ class SyncTest(CheckoutCase):
             expected,
         )
 
+    def test_the_sync_deletes_upstream_comments_before_vendor_lands(self):
+        commit(
+            self.upstream,
+            {
+                "pstack/skills/beta/tool.py": "#!/usr/bin/env python3\n# upstream note\nvalue = 1  # why\n",
+                "pstack/skills/beta/run.sh": "#!/bin/sh\n# upstream note\necho '#kept'\n",
+            },
+        )
+        self.sync()
+        skill = self.root / "vendor/pstack/skills/beta"
+        self.assertEqual((skill / "tool.py").read_text(), "#!/usr/bin/env python3\nvalue = 1\n")
+        self.assertEqual((skill / "run.sh").read_text(), "#!/bin/sh\necho '#kept'\n")
+
 
 class BadgeSyncTest(CheckoutCase):
     def test_a_newer_upstream_rewrites_the_badge_and_leaves_every_other_readme_byte(self):

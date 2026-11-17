@@ -41,7 +41,6 @@ class RolesPyMixin:
         providers_null.write_text('{"providers": [null]}')
         script_catalog = root / "script-catalog.json"
         script_catalog.write_text("{}")
-        # Grow the fixture until this interpreter raises RecursionError.
         depth = 20000
         while depth <= 1048576:
             deep_text = "[" * depth + "]" * depth

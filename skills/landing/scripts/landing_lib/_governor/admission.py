@@ -52,7 +52,6 @@ def _mint_ticket(tickets, kind, waiting):
         number += 1
     previous = os.umask(0o077)
     try:
-        # open asks for 0o666 and the 0o077 umask leaves 0o600, so the name is owner-readable when it appears.
         ticket = open(tickets / f"{number}-{kind}", "x")
     finally:
         os.umask(previous)

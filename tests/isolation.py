@@ -56,7 +56,6 @@ def _sibling(name: str, filename: str):
 _sibling("pstack_test_isolation_mounts", "isolation_mounts.py")
 _sibling("pstack_test_isolation_paths", "isolation_paths.py")
 _sibling("pstack_test_isolation_roots", "isolation_roots.py")
-# MARKER stays exported because the adoption tests read isolation.MARKER.
 from pstack_test_isolation_paths import (
     MARKER, ORIGINALS, POINTER, TOKEN, _LAYOUT, _WRITE_FLAGS, _adopt, _arg, _at, _base, _check,
     _entry, _fail, _fd_target, _frozen, _owned, _placed, _probe, _protected_write, _real,
@@ -192,16 +191,11 @@ def install() -> Path:
     if _root is not None and active != _root:
         raise _fail(f"{POINTER} now names {active!r}, not the run root {_root!r} this process installed")
     if _root is None:
-        # tempfile caches its first gettempdir() result, so drop it for the TMPDIR verified here.
         tempfile.tempdir = None
-        # The import system writes bytecode by renaming a temporary file over its entry in __pycache__. The guard
-        # refuses a rename in the checkout, so bytecode for this process goes under the run root instead.
         sys.pycache_prefix = os.path.join(active, "pycache")
     _root = active
     if not _armed:
-        # The guard refuses a delete outside the run root, so stale records go before it is armed.
         prune(protected)
-    # Publish the trusted record. The first install runs before _arm(); a repeat install writes a superset.
     _record(protected)
     _arm()
     _check(active)
@@ -480,8 +474,6 @@ def _hook(event: str, args: tuple) -> None:
         _local.busy = False
 
 
-# A runner child loads this file by path as pstack_test_isolation before discovery imports it as
-# tests.isolation. Both names give the first copy, so a process holds one guard and one run root.
 _first = sys.modules.setdefault("pstack_test_isolation", sys.modules[__name__])
 if _first is not sys.modules[__name__] and os.path.realpath(getattr(_first, "__file__", "") or "") == os.path.realpath(__file__):
     sys.modules[__name__] = _first

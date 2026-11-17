@@ -132,7 +132,6 @@ class Part08Test(OwnershipCase):
             a, swarm, rows = self.displaced_by("directory")
             event = ("noreplace", "from", "after", "swap")
             raced = self.backup_race_uninstall(a, swarm, rows[0]["backup"], event, foreign="directory")
-            # The backup's path was empty when the entry arrived, so the restore never looks at it again.
             self.assert_swap_survived(raced, a, swarm, rows, "directory", "directory", saved=False, noted=False)
     def test_a_directory_backup_that_can_go_neither_way_is_kept_aside(self):
             a, swarm, rows = self.displaced_by("directory")
@@ -229,7 +228,6 @@ class Part08Test(OwnershipCase):
                 a, swarm, rows = self.displaced_by("directory")
                 event = ("noreplace", "onto", "after", "swap")
                 raced = self.backup_race_uninstall(a, swarm, rows[0]["backup"], event, crossing=True, foreign="directory")
-                # The directory was already out of its path when the entry arrived, so only the proven directory is discarded.
                 self.assert_swap_survived(raced, a, swarm, rows, "directory", "directory", saved=False, noted=False)
     def test_an_entry_swapped_just_before_the_move_is_left_at_the_path_with_the_row_kept(self):
             """A swap in the instant before the move leaves the foreign entry at the live path and keeps the row."""

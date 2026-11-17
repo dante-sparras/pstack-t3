@@ -21,7 +21,6 @@ class OnboardDetectTest(BrigadeTest):
                                        "--detect", *extra))
 
     def test_fully_configured_store_asks_nothing(self):
-        # Processes: git and land build the fixture project and its contract.
         self.git_project()
         self.init_landing()
         self.landing_env()
@@ -40,7 +39,6 @@ class OnboardDetectTest(BrigadeTest):
         self.assertEqual(self.store_files(), before)
 
     def test_fresh_repo_lists_only_the_missing_settings(self):
-        # Processes: git builds the fixture repository. No land contract and no store exist.
         self.git_project()
         (self.project / "package.json").write_text(json.dumps({"scripts": {"test": "jest", "build": "tsc"}}))
         found = self.detect()
@@ -71,7 +69,6 @@ class OnboardDetectTest(BrigadeTest):
         self.assertEqual(found["facts"]["mode"]["value"], "full")
 
     def test_models_configured_when_project_roles_file_exists(self):
-        # Processes: git builds the fixture repository. No land contract and no store exist.
         self.git_project()
         roles_dir = self.project / ".pstack"
         roles_dir.mkdir(exist_ok=True)
@@ -81,7 +78,6 @@ class OnboardDetectTest(BrigadeTest):
         self.assertNotIn("models", found["missing"])
 
     def test_generated_paths_without_a_map_read_as_invalid(self):
-        # Processes: git and land build the fixture project and a contract with generated paths but no map.
         self.git_project()
         self.init_landing("--generated", "skills")
         self.landing_env()
@@ -92,7 +88,6 @@ class OnboardDetectTest(BrigadeTest):
         self.assertIn("land.py init --generated-map", found["facts"]["generated"]["fix"])
 
     def test_non_utf8_restaurant_json_reports_invalid_restaurant(self):
-        # Processes: git builds the fixture repository. A non UTF-8 restaurant.json must not crash detect.
         self.git_project()
         self.open()
         (self.at / "restaurant.json").write_bytes(b"\xff\xfe\x00bad")
@@ -102,7 +97,6 @@ class OnboardDetectTest(BrigadeTest):
         self.assertEqual(found["facts"]["restaurant"]["state"], "invalid")
 
     def test_outside_mode_reads_as_invalid(self):
-        # Processes: git builds the fixture repository. The writers refuse this value, so the test writes it directly.
         self.git_project()
         self.open()
         meta_path = self.at / "restaurant.json"
@@ -113,7 +107,6 @@ class OnboardDetectTest(BrigadeTest):
         self.assertEqual(found["facts"]["mode"]["state"], "invalid")
 
     def test_required_checks_use_trunk_not_current_branch(self):
-        # Processes: git builds the fixture repository. Fake git and gh on PATH isolate the trunk read.
         self.git_project()
         import os as _os
         import shutil as _shutil
@@ -170,7 +163,6 @@ class OnboardDetectTest(BrigadeTest):
         self.assertEqual(found["facts"]["required_checks"]["value"], ["test (3.10)", "test (3.12)"])
 
     def test_gitlab_remote_gives_unknown_pr_ability(self):
-        # Processes: git builds the fixture repository. A fake git on PATH isolates the remote read.
         self.git_project()
         import os as _os
         import shutil as _shutil
@@ -199,7 +191,6 @@ class OnboardDetectTest(BrigadeTest):
         self.assertEqual(found["facts"]["pr_ability"]["value"], "remote is not GitHub")
 
     def test_recorded_contract_gives_detected_contract_checks_and_generated(self):
-        # Processes: git and land build the fixture project and its contract with checks and generated map.
         self.git_project()
         self.init_landing("--check", "make test", "--generated", "skills", "--generated-map", "t3src=skills/dst", "--rebuild", "python3 scripts/build.py")
         self.landing_env()
@@ -210,7 +201,6 @@ class OnboardDetectTest(BrigadeTest):
         self.assertEqual(found["facts"]["generated"]["state"], "detected")
 
     def test_bad_workers_reporting_autofire_read_as_invalid(self):
-        # Processes: git builds the fixture repository. The writers refuse these values, so the test writes them directly.
         self.git_project()
         self.open()
         meta_path = self.at / "restaurant.json"
@@ -225,7 +215,6 @@ class OnboardDetectTest(BrigadeTest):
             meta_path.write_text(json.dumps(meta))
 
     def test_repository_cap_reports_recorded_cap(self):
-        # Processes: git and land build the fixture project and its cap.
         self.git_project()
         self.init_landing("--cap", "3")
         self.landing_env()
@@ -235,7 +224,6 @@ class OnboardDetectTest(BrigadeTest):
                          {"state": "detected", "value": 3, "fix": None})
 
     def test_malformed_status_gives_invalid_landing_and_generated(self):
-        # Processes: git and land build the fixture project and its contract. A fake land.py on disk isolates the malformed read.
         self.git_project()
         self.init_landing()
         self.landing_env()

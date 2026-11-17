@@ -95,7 +95,6 @@ class RebuildsBase:
             "    os.waitpid(child, 0)\n"
         )
         command = f"{shlex.quote(sys.executable)} -c {shlex.quote(script)} {shlex.quote(str(pidfile))}"
-        # The command is a process whose detached child holds the pipe open into grace.
         calls = []
         previous = signal.getsignal(signal.SIGINT)
         self.addCleanup(signal.signal, signal.SIGINT, previous)
@@ -109,7 +108,6 @@ class RebuildsBase:
         started = [None]
 
         def wrapping(self, timeout=None):
-            # A grace select carries the five second budget. Shorter selects are the initial drain or the exit poll.
             if timeout is not None and timeout > 1 and len(sent) < hits:
                 sent.append(1)
                 signal.raise_signal(signal.SIGINT)

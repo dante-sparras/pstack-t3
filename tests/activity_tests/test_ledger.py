@@ -51,7 +51,6 @@ class LedgerTest(OutputCase):
         self.assertEqual(fixture.stdout_bytes("--text"), text)
         for document in (absent, present):
             self.assertNotIn(b".ldg", document)
-            # RENDERER reads D.L to anchor a chip, so the ledger hook is the token that must be absent.
             self.assertNotIn(b"byCurrent", document)
     def test_timeline_header_wraps_its_attempt_lines_instead_of_squeezing_the_id_and_title_to_no_width(self):
         """The attempt block's 100% basis fills the header's line, so the header needs a wrap to give the id, title, and chip a line of their own."""
@@ -136,7 +135,6 @@ class LedgerTest(OutputCase):
         self.assertEqual(html_current(html), [phrase(500)])
         summary, payload = html_fold(html)[0]
         self.assertEqual(summary, "attempts 1-499: 499 workers, all open")
-        # The byte cut drops the oldest attempt lines, so the folded payload keeps the newest of its own lines.
         self.assertEqual(payload, [phrase(number) for number in range(411, 500)])
         self.assertEqual(text_summary(text), ["attempts 1-499: 499 workers, all open"])
         self.assertEqual(text_current(text), [phrase(500)])

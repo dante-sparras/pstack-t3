@@ -61,7 +61,6 @@ def publish(store, base, candidate):
     if result.returncode != 0:
         if remote_trunk(store) != base:
             return "trunk moved during landing"
-        # drain.py appends ". Fix it, then run land.py resume" to this text.
         reason = seam.git_reason(result.stderr, compact=True)
         raise seam.Infrastructure(f"push rejected: {reason}. Change the remote or its branch protection so it accepts this push. Selecting human mode with land.py mode human requires an empty queue")
     seam.git("fetch", contract["remote"], contract["trunk"], cwd=repo)
@@ -124,7 +123,6 @@ def rewound(store, base):
     tip = store.contract.get("tip") or ""
     if not tip:
         return False
-    # git merge-base --is-ancestor exits 0 for an ancestor, 1 for a commit that is not one, and another code on an error.
     code = seam.git("merge-base", "--is-ancestor", tip, base, cwd=store.repo, check=False).returncode
     if code == 0:
         return False

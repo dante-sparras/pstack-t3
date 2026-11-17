@@ -110,7 +110,6 @@ def restore_race(path, occupy, link_error=False, rename=None):
         "shutil.move = filling(shutil.move)\n"
         "os.rename = filling(os.rename)\n"
         + without_noreplace(hooked="filling", link_error=link_error, rename=rename)
-        # The occupant also arrives at a hard link that is then refused.
         + "os.link = filling(os.link, hard_link=True)\n"
         f"if {rename is not None}:\n"
         "    holding = module.link_held\n"

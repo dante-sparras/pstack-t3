@@ -14,7 +14,6 @@ from ..support import Path, ProcessReason, SCRIPT, json, real_process
 
 class SetMixin:
     def test_a_path_under_the_resolved_tmp_is_refused(self):
-        # Uses call_in_process so the Path resolve patch reaches the command.
         from unittest import mock
         from ..support import call_in_process
         self.open()
@@ -60,7 +59,6 @@ class SetMixin:
         self.assertEqual((self.at / "restaurant.json").read_bytes(), before)
 
     def test_set_cap_and_review_repair_a_string_int_and_list_stored_map_and_write_a_clean_one(self):
-        # A hand edit leaves a non-object here, and set merges into an existing value only when it is a dictionary.
         self.open()
         cases = (("caps", '"oops"', ("--cap", "polish=1"), {"polish": 1}),
                  ("caps", "2", ("--cap", "polish=1"), {"polish": 1}),
@@ -80,7 +78,6 @@ class SetMixin:
     def test_set_landing_exits_2(self):
         self.open()
         before = (self.at / "restaurant.json").read_bytes()
-        # process exit status
         result = real_process(
             ProcessReason.EXIT_STATUS, SCRIPT,
             ["--store", str(self.store), "--at", str(self.at), "set", "--landing", "merge"],
@@ -128,7 +125,6 @@ class SetMixin:
 
     def test_set_scratch_dir_reads_back_stores_the_resolved_path_and_a_clear_removes_the_key(self):
         self.open()
-        # A system directory outside /tmp wherever the checkout is. This test never creates or writes it.
         parent = str(Path("/usr").resolve())
         meta = json.loads(self.brigade("set", "--scratch-dir", f"{parent}/./x/.."))
         self.assertEqual(meta["scratchDir"], parent)

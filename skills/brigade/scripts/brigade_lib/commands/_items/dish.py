@@ -141,12 +141,10 @@ def record_usage_limit(restaurant, args):
         argv += ["--options", args.options]
     for author in args.author or ():
         argv += ["--author", author]
-    # roles.py reads --out as a provider, so one provider with two cooling seats is passed once.
     for name in dict.fromkeys(entry[0].partition("/")[0] for entry in live):
         argv += ["--out", name]
     if mode is not None:
         argv += ["--brief-mode", mode]
-    # A full-send item resolves no seat through roles.py and has no backup seat, so a usage limit parks it.
     payload = {"decision": "park"} if dish["station"] == full_send.STATION else backup_payload(argv, args.catalog, text)
     decision = payload.get("decision")
     if decision == "not-usage-limit":
@@ -174,7 +172,6 @@ def record_usage_limit(restaurant, args):
         if parked and dish["state"] == "in-progress":
             restaurant.update("dishes.tsv", args.id, "dish", state="blocked")
     if parked:
-        # The earliest live end is the first moment any seat may be used again, and a resume names one.
         ends = [moment_of(end)] + [moment_of(entry[1]) for entry in live]
         earliest = min(found for found in ends if found is not None)
         return f"{args.id}: parked until {earliest.isoformat()}; launch nothing before then"
