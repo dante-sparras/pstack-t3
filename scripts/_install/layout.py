@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from . import records
+from . import system
 
 config_home = None
 
@@ -70,14 +71,14 @@ def link_target(checkout, path):
 
 def proves(checkout, entry, original):
     try:
-        text = os.readlink(entry)
+        text = system.read_link(entry)
     except (OSError, ValueError):
         return False
     base = os.path.realpath(os.path.dirname(original))
-    return os.path.normpath(os.path.join(base, text)) == link_target(checkout, original)
+    return system.same_path(os.path.join(base, text), link_target(checkout, original))
 
 def identity(stat):
-    return stat.st_dev, stat.st_ino, stat.st_ctime_ns
+    return system.identity(stat)
 
 def slot_of(path):
     return (os.path.realpath(os.path.dirname(path)), os.path.basename(path))
@@ -92,8 +93,8 @@ def inside_checkout(path):
     return real == skills or skills in real.parents
 
 def describe(path):
-    if os.path.islink(path):
-        return f"link to {os.readlink(path)}"
+    if system.is_link(path):
+        return f"link to {system.read_link(path)}"
     return "directory" if os.path.isdir(path) else "file"
 
 # Path.exists() reads each of these as "not there" on Python 3.10 and 3.12.

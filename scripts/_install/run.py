@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-import fcntl
 import os
 import shutil
 import sys
 import time
-from contextlib import ExitStack, contextmanager
+from contextlib import ExitStack
 from dataclasses import replace
 from pathlib import Path
 
@@ -15,6 +14,7 @@ from . import plans
 from . import records
 from . import restore
 from . import strays
+from . import system
 def _tally_lines(plan):
     if plan.untracked:
         print(f"{plan.untracked} links already point at this checkout but are not tracked; uninstall leaves them")
@@ -31,7 +31,7 @@ def act(step, root):
     """Do the step's change. Return why it was not done when it declined without an error."""
     if step.kind == "create":
         os.makedirs(os.path.dirname(step.path), exist_ok=True)
-        os.symlink(layout.link_target(root, step.path), step.path, target_is_directory=True)
+        system.make_link(layout.link_target(root, step.path), step.path)
     elif step.kind == "move":
         shutil.move(step.path, step.backup)
     elif step.kind == "unlink":
@@ -110,19 +110,7 @@ def execute(plan, state, root):
             strays.empty_out(state, name)
     return counts
 
-@contextmanager
-def locked(state):
-    state = Path(state)
-    state.mkdir(parents=True, exist_ok=True)
-    fd = os.open(state, os.O_RDONLY)
-    try:
-        fcntl.flock(fd, fcntl.LOCK_EX)
-        yield
-    finally:
-        try:
-            fcntl.flock(fd, fcntl.LOCK_UN)
-        finally:
-            os.close(fd)
+locked = system.locked
 
 def needs_lock(plan, strays, state):
     writes = bool(plan.steps) or any(stray.kind != "left" for stray in strays)

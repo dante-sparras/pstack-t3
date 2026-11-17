@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from . import layout
 from . import moves
 from . import records
+from . import system
 
 @dataclass(frozen=True)
 class Stray:
@@ -141,6 +142,10 @@ def empty_out(state, stamp, harness=None):
     Call it only inside `locked`. It never raises and prints nothing.
     """
     if os.rmdir not in os.supports_dir_fd:
+        backups = os.path.join(str(state), "backups")
+        inner = os.path.join(backups, stamp)
+        if not system.is_link(backups) and not system.is_link(inner):
+            system.remove_empty_dirs(([os.path.join(inner, harness)] if harness is not None else []) + [inner])
         return
     # O_NOFOLLOW refuses a symlink at backups/ or <stamp>, and rmdir refuses a symlink, a file, and a directory that holds anything.
     flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
@@ -168,6 +173,13 @@ def empty_out_matched(state, recorded, stamp, harness):
     The first rmdir that fails ends it. Call it only inside `locked`. It never raises and prints nothing.
     """
     if os.rmdir not in os.supports_dir_fd:
+        def stamp_and_harness(root):
+            inner = os.path.join(str(root), "backups", stamp)
+            return os.lstat(inner), os.lstat(os.path.join(inner, harness))
+
+        with suppress(OSError, ValueError):
+            if all(map(os.path.samestat, stamp_and_harness(state), stamp_and_harness(recorded))):
+                empty_out(state, stamp, harness)
         return
     flags = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
     with suppress(OSError, ValueError), ExitStack() as stack:

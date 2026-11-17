@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from . import layout
+from . import system
 
 RENAME_NOREPLACE = 1
 
@@ -22,6 +23,8 @@ RENAME_EXCL = 0x00000004
 
 def rename_noreplace(source, target):
     """Rename `source` to `target` only while `target` is empty. Return 0, or the errno that stopped it."""
+    if system.WINDOWS:
+        return system.rename_noreplace_windows(source, target)
     try:
         libc = ctypes.CDLL(None, use_errno=True)
     except (OSError, AttributeError):
@@ -81,7 +84,7 @@ def put_back(aside, path):
     return refusal(path, place(aside, path))
 
 def discard(path):
-    if os.path.isdir(path) and not os.path.islink(path):
+    if os.path.isdir(path) and not system.is_link(path):
         shutil.rmtree(path)
     else:
         os.unlink(path)
@@ -128,7 +131,7 @@ def listing(directory):
 def holders(parent):
     for name in listing(parent):
         directory = os.path.join(parent, name)
-        if name.startswith(HOLDER) and not os.path.islink(directory) and os.path.isdir(directory):
+        if name.startswith(HOLDER) and not system.is_link(directory) and os.path.isdir(directory):
             yield name, directory
 
 def made_directory(parent, prefix):
