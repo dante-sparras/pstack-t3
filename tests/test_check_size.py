@@ -43,7 +43,6 @@ def setUpModule():
 
 ROOT = Path(__file__).resolve().parents[1]
 
-# Covers the 12 split files today.
 ROLES_MODULES = tuple(
     f"t3/scripts/_roles/{p.name}"
     for p in sorted((ROOT / "t3/scripts/_roles").glob("*.py"))

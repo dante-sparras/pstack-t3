@@ -36,7 +36,6 @@ class RailAMixin:
                 owner = None
             else:
                 owner_code = owner_out = owner_err = None
-            # inherited environment
             added = real_process(
                 ProcessReason.INHERITED_ENV, SCRIPT,
                 ["--at", str(directory), "ticket", "add", "--kind", "fix", "--summary", "Keep this ticket"],

@@ -96,7 +96,6 @@ class FromReportMixin:
         for flags, message in ((("--summary", "x", "--from-report", "reports/D1.md"),
                                 "argument --from-report: not allowed with argument --summary"),
                                ((), "one of the arguments --summary --from-report is required")):
-            # process exit status
             result = real_process(
                 ProcessReason.EXIT_STATUS, SCRIPT,
                 ["--store", str(self.store), "--at", str(self.at), "ticket", "add", *flags],

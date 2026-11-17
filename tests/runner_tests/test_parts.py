@@ -133,7 +133,6 @@ class PartsMixin:
             self.assertEqual(len({assignment[test.seq] for test in plan if test.module == module}), 1)
 
     def test_a_broken_durations_file_still_covers_every_test_exactly_once(self):
-        # This starts no process: the split reads files the test writes.
         lines = ["import unittest", "", "class NineTest(unittest.TestCase):"]
         for index in range(9):
             lines.append(f"    def test_{index:02d}(self):")
@@ -192,7 +191,6 @@ class PartsMixin:
         self.assertEqual(costs.estimate("bad", 4), 4 * 2.0 + 1 * 3.0)
 
     def test_the_split_does_not_depend_on_plan_order(self):
-        # This starts no process: the split runs in memory.
         first = tuple(run_tests.Test(seq, f"mod.Case.test_{name}", "mod", "mod.Case")
                       for seq, name in enumerate("abcd"))
         second = tuple(run_tests.Test(seq, f"mod.Case.test_{name}", "mod", "mod.Case")
@@ -351,7 +349,6 @@ class BuildShardsMixin:
     def test_every_seq_is_in_exactly_one_shard_and_each_shard_holds_1_to_20_seqs_of_one_module_in_ascending_order(self):
         for sizes in ([1], [10], [11], [25, 3], [100, 1, 10, 7, 31]):
             with self.subTest(sizes=sizes):
-                # Round-robin, so the tests of different modules interleave in the plan while each has tests left.
                 modules = [f"m{index}" for turn in range(max(sizes)) for index, size in enumerate(sizes) if turn < size]
                 plan = tuple(run_tests.Test(seq, "one.id", module, f"{module}.C{seq}") for seq, module in enumerate(modules))
                 shards = run_tests.build_shards(plan)
@@ -391,7 +388,6 @@ class BuildShardsMixin:
             def sweep(self):
                 return []
 
-        # list_tests starts a child. Watch replaces SIGINT and SIGTERM. When it is the child subreaper, its sweep kills processes below this one.
         originals = (run_tests.list_tests, run_tests.run_pool, run_tests.Watch)
         run_tests.list_tests = list_tests
         run_tests.run_pool = run_pool

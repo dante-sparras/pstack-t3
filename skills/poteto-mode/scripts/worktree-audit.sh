@@ -1,34 +1,39 @@
 #!/usr/bin/env bash
-# Read-only worktree prune audit for Linux and macOS. Classifies every git
-# worktree by size, last commit age, last checkout activity, merge state,
-# uncommitted work, upstream state, PR state, and whether T3 created it.
-# Emits a table sorted by size with a suggested bucket. Never deletes anything;
-# deletion stays a human-gated step in the playbook, and the playbook checks
-# T3 thread bindings with T3's tools, which this script cannot see.
-#
-# Usage: worktree-audit.sh [-b|--base <ref>] [repo-path] [--t3-worktrees DIR]
-#   repo-path defaults to the current repo.
-#   -b sets the ref the MERGED column checks against (e.g. origin/integration).
-#   Without it the base is origin/HEAD, then origin/main, then origin/master.
-#   origin/HEAD is the remote's default branch, not necessarily the branch PRs
-#   merge into; pass -b when they differ.
-# Env:   TRUNK=<branch>     override the trunk branch used when -b is absent (as origin/<branch>)
-#        T3CODE_HOME=<dir>  T3 data dir, the variable T3's server reads (else ~/.t3)
-#        T3_HOME=<dir>      data dir when T3CODE_HOME is unset
-#        T3_WORKTREES=<dir> configured worktree directory for this run
-#        RECENT_DAYS=<n>    activity window for verify-recent (default: 4)
-# T3=yes when the worktree sits under <data dir>/worktrees, or under
-# worktreesDirectory or previousWorktreesDirectories in
-# <data dir>/userdata/settings.json. dev/settings.json is read only when
-# T3CODE_HOME is unset and userdata/settings.json is absent. --t3-worktrees
-# and T3_WORKTREES replace those settings roots, and the flag wins.
-# An empty, relative, or filesystem-root value is ignored. The default
-# directory still counts, matching T3's managed set.
-# previousWorktreesDirectories counts only when it is an array of strings.
-# T3CODE_HOME and each settings path are trimmed before ~ expansion.
-# An existing directory is compared by its physical path. A filesystem root
-# is ignored after that resolution, so a symlink to / matches nothing.
 set -u
+
+usage() {
+	cat <<'USAGE'
+Read-only worktree prune audit for Linux and macOS. Classifies every git
+worktree by size, last commit age, last checkout activity, merge state,
+uncommitted work, upstream state, PR state, and whether T3 created it.
+Emits a table sorted by size with a suggested bucket. Never deletes anything;
+deletion stays a human-gated step in the playbook, and the playbook checks
+T3 thread bindings with T3's tools, which this script cannot see.
+
+Usage: worktree-audit.sh [-b|--base <ref>] [repo-path] [--t3-worktrees DIR]
+  repo-path defaults to the current repo.
+  -b sets the ref the MERGED column checks against (e.g. origin/integration).
+  Without it the base is origin/HEAD, then origin/main, then origin/master.
+  origin/HEAD is the remote's default branch, not necessarily the branch PRs
+  merge into; pass -b when they differ.
+Env:   TRUNK=<branch>     override the trunk branch used when -b is absent (as origin/<branch>)
+       T3CODE_HOME=<dir>  T3 data dir, the variable T3's server reads (else ~/.t3)
+       T3_HOME=<dir>      data dir when T3CODE_HOME is unset
+       T3_WORKTREES=<dir> configured worktree directory for this run
+       RECENT_DAYS=<n>    activity window for verify-recent (default: 4)
+T3=yes when the worktree sits under <data dir>/worktrees, or under
+worktreesDirectory or previousWorktreesDirectories in
+<data dir>/userdata/settings.json. dev/settings.json is read only when
+T3CODE_HOME is unset and userdata/settings.json is absent. --t3-worktrees
+and T3_WORKTREES replace those settings roots, and the flag wins.
+An empty, relative, or filesystem-root value is ignored. The default
+directory still counts, matching T3's managed set.
+previousWorktreesDirectories counts only when it is an array of strings.
+T3CODE_HOME and each settings path are trimmed before ~ expansion.
+An existing directory is compared by its physical path. A filesystem root
+is ignored after that resolution, so a symlink to / matches nothing.
+USAGE
+}
 
 invoke_pwd=$(pwd)
 repo=""
@@ -45,7 +50,7 @@ while [ $# -gt 0 ]; do
 			fi
 			flag_base="$1"
 			;;
-		-h|--help) sed -n '2,/^set -u/p' "$0" | sed '$d; s/^# \{0,1\}//'; exit 0 ;;
+		-h|--help) usage; exit 0 ;;
 		--t3-worktrees)
 			shift
 			if [ $# -eq 0 ] || [ -z "${1:-}" ]; then
@@ -88,9 +93,6 @@ expand_home() {
 	esac
 }
 
-# T3 trims the data dir and settings paths before it expands ~.
-# JavaScript String.prototype.trim, as UTF-8 bytes. [:space:] follows the
-# locale and keeps U+00A0 and U+FEFF. Python str.strip() keeps U+FEFF.
 trim() {
 	local s="$1" prev="" w
 	while [ "$s" != "$prev" ]; do
@@ -114,9 +116,6 @@ trim() {
 	printf '%s\n' "$s"
 }
 
-# Git records the physical path. cd -P and pwd -P are POSIX. realpath flags
-# differ between GNU and BSD, so this does not call realpath. A missing leaf
-# keeps the physical path of the ancestor that does exist.
 physical_abs() {
 	local path="$1" tail="" base
 	[ -z "$path" ] && return 0
@@ -140,7 +139,6 @@ physical_abs() {
 	printf '%s\n' "$1"
 }
 
-# Drop . and .. without resolving symlinks. A non-absolute input prints nothing.
 normalize_abs() {
 	local rest="$1" part acc=""
 	case "$rest" in
@@ -171,8 +169,6 @@ normalize_abs() {
 	if [ -z "$acc" ]; then printf '/\n'; else printf '/%s\n' "$acc"; fi
 }
 
-# Empty, relative, or a filesystem root prints nothing. A root would mark
-# every path on that drive as a T3 worktree.
 resolve_worktrees_dir() {
 	local raw expanded abs
 	raw=$(trim "$1")
@@ -247,8 +243,6 @@ if isinstance(previous, list):
 	echo "warn: jq and python3 missing; T3 worktree location unread" >&2
 }
 
-# A blank T3CODE_HOME is unset. T3's resolveBaseDir trims first, and an empty
-# result uses the default data dir rather than a padded path.
 t3_home=""
 if [ -n "$(trim "${T3CODE_HOME:-}")" ]; then
 	t3_home=$(resolve_t3_home "$T3CODE_HOME")
@@ -303,12 +297,10 @@ fi
 recent_days="${RECENT_DAYS:-4}"
 now=$(date +%s)
 
-# Epoch seconds to YYYY-MM-DD. GNU date takes -d @N, BSD date takes -r N.
 fmt_day() {
 	date -d "@$1" '+%Y-%m-%d' 2>/dev/null || date -r "$1" '+%Y-%m-%d' 2>/dev/null || echo "?"
 }
 
-# Kilobytes to a short human size. du -sk is the same on GNU and BSD.
 human() {
 	awk -v k="$1" 'BEGIN {
 		split("K M G T", u, " "); i = 1
@@ -317,7 +309,6 @@ human() {
 	}'
 }
 
-# Main worktree is the first entry; everything else is a candidate.
 main_wt=$(git worktree list --porcelain | sed -n 's/^worktree //p' | head -1)
 git rev-parse --git-dir >/dev/null 2>&1 || { echo "error: not a git repo: $repo" >&2; exit 1; }
 
@@ -337,9 +328,6 @@ fi
 if [ -z "$base" ]; then
 	echo "warn: no base ref (origin/HEAD, origin/main, origin/master all missing); MERGED shows ?" >&2
 else
-	# The base drives the merge check. The fetch is best-effort (stale is fine for
-	# a first pass) and runs before the check, since -b may name a branch not
-	# fetched yet. The explicit refspec creates it even in a single-branch clone.
 	case "$base" in
 	origin/*) git fetch origin "+refs/heads/${base#origin/}:refs/remotes/$base" --quiet 2>/dev/null \
 		|| echo "warn: could not fetch $base; MERGED may be stale" >&2 ;;
@@ -355,8 +343,6 @@ else
 fi
 [ -n "$base" ] && echo "# base: $base"
 
-# PR state by branch, fetched once as [{number, state, head}] with a lowercase
-# state. Origin when its CLI can read this repo's PRs, otherwise gh.
 prs=$(mktemp)
 trap 'rm -f "$prs"' EXIT
 if ! command -v jq >/dev/null 2>&1 || { ! command -v origin >/dev/null 2>&1 && ! command -v gh >/dev/null 2>&1; }; then
@@ -383,7 +369,6 @@ fi
 
 printf "SIZE\tAGE\tACTIVE\tMERGED\tDIRTY\tREMOTE\tPR\tT3\tBUCKET\tWORKTREE\n"
 
-# Paths are read whole, so a worktree path with spaces survives.
 git worktree list --porcelain | sed -n 's/^worktree //p' | while IFS= read -r wt; do
 	[ "$wt" = "$main_wt" ] && continue
 
@@ -401,7 +386,6 @@ git worktree list --porcelain | sed -n 's/^worktree //p' | while IFS= read -r wt
 $t3_roots
 EOF
 
-	# A registered worktree whose directory is gone is metadata only.
 	if [ ! -d "$wt" ]; then
 		printf "0\t-\t-\t-\t-\t-\t-\t%s\tprunable-missing\t%s\n" "$t3" "$wt"
 		continue
@@ -413,28 +397,22 @@ EOF
 	head_ts=$(git -C "$wt" log -1 --format='%ct' HEAD 2>/dev/null)
 	age=$([ -n "$head_ts" ] && echo "$(( (now - head_ts) / 86400 ))d" || echo "?")
 
-	# Newest HEAD reflog entry: the last commit, checkout, reset, or rebase in
-	# this worktree. Catches a worktree in use whose commits are old.
 	active_ts=$(git -C "$wt" reflog -1 --format='%ct' HEAD 2>/dev/null)
 	active_ts="${active_ts:-${head_ts:-0}}"
 	active=$([ "$active_ts" -gt 0 ] && fmt_day "$active_ts" || echo "?")
 	recent=no
 	[ "$active_ts" -gt 0 ] && [ $(( (now - active_ts) / 86400 )) -le "$recent_days" ] && recent=yes
 
-	# Squash-merged branches are not ancestors of the base, so PR state is the
-	# real signal; merge-base only catches fast-forward/rebase merges.
 	if [ -z "$base" ]; then merged="?"
 	elif git merge-base --is-ancestor "$head" "$base" 2>/dev/null; then merged=YES
 	else merged=no; fi
 
-	# Distinguish real WIP (tracked edits) from disposable untracked scratch.
 	porcelain=$(git -C "$wt" status --porcelain 2>/dev/null)
 	if [ -z "$porcelain" ]; then dirty=clean
 	elif printf '%s\n' "$porcelain" | grep -qv '^??'; then
 		dirty="wip:$(printf '%s\n' "$porcelain" | grep -cv '^??')"
 	else dirty="scratch:$(printf '%s\n' "$porcelain" | grep -c '^??')"; fi
 
-	# Compare against the configured upstream, else origin/<branch>.
 	branch=$(git -C "$wt" symbolic-ref --quiet --short HEAD 2>/dev/null || echo "")
 	if [ -z "$branch" ]; then remote=detached
 	else

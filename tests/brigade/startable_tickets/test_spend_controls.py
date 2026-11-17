@@ -137,7 +137,6 @@ class SpendStandingMixin:
         ]))
 
     def test_startable_never_lists_a_low_ticket_of_a_paused_goal_as_riding_with_another_ticket(self):
-        # The paused check comes before the ride-along branch, so a paused goal starts nothing even as a rider.
         self.queue()
         self.goal("activity view")
         self.goal("current with upstream", "--share", "1")
@@ -164,7 +163,6 @@ class SpendStandingMixin:
         self.assertEqual(self.store_files(), before)
 
     def test_startable_rides_a_low_ticket_of_an_open_goal_and_pauses_one_of_a_paused_goal(self):
-        # The paused check leaves the open goal's rider alone and holds the paused goal's rider even when it overlaps a startable ticket.
         self.queue()
         self.goal("activity view")
         self.goal("current with upstream")
@@ -185,7 +183,6 @@ class SpendStandingMixin:
         self.assertEqual(self.store_files(), before)
 
     def test_startable_pauses_a_waiting_rider_of_a_goal_whose_running_item_keeps_running(self):
-        # A paused goal holds its waiting tickets and lets the item already in flight finish.
         self.queue()
         self.goal("activity view")
         self.filed("Fix a", "--paths", "a.txt", "--goal", "G1")

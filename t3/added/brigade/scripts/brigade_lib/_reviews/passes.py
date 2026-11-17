@@ -96,7 +96,6 @@ def record_pass(restaurant, dish_id, pr, sha, verdict, author, verifier, note=""
         report_edits(restaurant, report)
     if verdict == "pass" and not member:
         edits_gate(restaurant, dish_id, sha, report)
-    # Read the report before the append, so a line the parser refuses leaves no pass row and no thread row.
     body = worker_report(restaurant, dish_id)
     children, unreadable = report_threads(body) if body else ((), ())
     if unreadable:

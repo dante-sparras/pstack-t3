@@ -284,7 +284,6 @@ def _verify_marker(active: str, token: str) -> None:
 
 def _base(protected: tuple[str, ...]) -> str:
     """Return the first temporary directory outside every protected real root."""
-    # No tempfile.gettempdir() here, because its writability probe would create a file before the guard exists.
     candidates = [os.environ.get("TMPDIR", ""), "/tmp", "/var/tmp", "/usr/tmp"]
     for value in candidates:
         if not value or not os.path.isabs(value):

@@ -95,7 +95,6 @@ def record_blocked(restaurant, ids, kind, station, summary, paths, timebox, bran
 
 
 def unfireable(restaurant, ids, waits=None):
-    # A ticket fired again is the same work, so an item that owes its round decision holds its tickets.
     for dish in restaurant.rows("dishes.tsv"):
         held = [ident for ident in ids if ident in dish["tickets"].split(",")]
         refusal = fix_round_refusal(restaurant, dish) if held else None
@@ -231,8 +230,6 @@ def fire(restaurant, ids, station, task, thread, branch, summary, timebox, paths
                 record_blocked(restaurant, ids, "workers", station, summary, paths, timebox, branch, reason, kind, ride_along,
                                doc_item)
                 raise BrigadeError(f"nothing fired: {full}")
-        # land.py can wait on the landing database, so the claim runs outside the store lock.
-        # Another command may fire or take the tickets meanwhile, so the checks run again before the write.
         try:
             lease = claim_lease(restaurant, dish, leased) if leased else ""
         except ClaimError as error:

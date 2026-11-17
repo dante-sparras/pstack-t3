@@ -332,7 +332,6 @@ def _bytecode_flag(environ):
 
 
 def _drain_atexit(saved, recorded):
-    # CPython atexit.unregister leaves the slot and does not shrink _ncallbacks().
     try:
         delta = atexit._ncallbacks() - saved.atexit_count
         if delta != len(recorded):
@@ -354,14 +353,9 @@ def _execute(saved, invocation):
     if invocation.env is not None:
         os.environ.clear()
         os.environ.update(dict(invocation.env))
-    # A real interpreter resolves its script argument against the directory it starts in and
-    # runs that path, so the traceback and __file__ name that path.
     program = os.path.join(os.getcwd(), os.fspath(typed))
     sys.argv = _TypedArgv([os.fspath(typed), *[os.fspath(part) for part in invocation.argv]])
     if pkgutil.get_importer(program) is None:
-        # runpy.run_path runs a plain script with sys.path untouched, while a real interpreter
-        # puts the script's own directory first, with symlinks resolved. A directory or zipfile
-        # is a valid sys.path entry, and run_path inserts it itself.
         sys.path.insert(0, os.path.dirname(os.path.realpath(program)))
     sys.dont_write_bytecode = _bytecode_flag(os.environ)
     if invocation.clock is not None:
@@ -446,8 +440,6 @@ def invoke(invocation):
     if os.environ.get("PSTACK_TEST_REAL_PROCESS") == "1":
         return _run_real(invocation, timeout=None)
     if invocation.env is not None and not isolation.admits(invocation.env):
-        # The guard keeps every guarded name in this process, so an environment that drops one or
-        # gives it a refused value runs in a real interpreter, which takes it as given.
         return _run_real(invocation, timeout=None)
     _depth += 1
     try:

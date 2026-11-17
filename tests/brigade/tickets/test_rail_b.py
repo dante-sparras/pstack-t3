@@ -102,7 +102,6 @@ class RailBMixin:
         self.assertNotIn("blocked:", self.brigade("ticket", "list"))
 
     def test_ticket_help_names_paths(self):
-        # -h output
         result = real_process(ProcessReason.HELP, SCRIPT, ["--help"])
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("add, list, update, move, take, or record paths on tickets on the rail", " ".join(result.stdout.split()))

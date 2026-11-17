@@ -70,7 +70,6 @@ def walk(root, stale_hours=24, repo=None):
         return f"no restaurants under {root}", []
     lines, failures = [], []
     for project in sorted(groups):
-        # The executive admin comes first in its repository.
         coordinators = sorted(groups[project], key=lambda restaurant: (not is_admin(restaurant.meta),
                                                                        str(restaurant.dir / "restaurant.json")))
         status = seam.land_result(project, "status")

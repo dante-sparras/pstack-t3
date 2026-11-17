@@ -52,7 +52,6 @@ class Part19Test(OwnershipCase):
             """Run checkout a's install with a first step that runs `breaks` on the manifest path and then `fails`. Return the run and the manifest path."""
             a = make_checkout(self.home, "a")
             manifest = legacy_file(self.home)
-            # Stands in for a step that fails while another program rewrites the manifest or changes its mode between the step's record and its undo.
             code = (
                 "import errno\n"
                 "def act(step, root):\n"

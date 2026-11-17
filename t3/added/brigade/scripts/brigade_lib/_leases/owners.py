@@ -43,12 +43,10 @@ def set_thread(restaurant, args):
             prefix = holder_prefix(restaurant.meta)
             result = seam.land_result(restaurant.meta["projectRoot"], "owner", "--prefix", prefix, "--generation", str(generation))
             error = result.stderr.strip().removeprefix("land: ")
-            # A project with no landing contract has no leases to fence.
             if result.returncode != 0 and "has no landing contract" not in error and "not a git repository" not in error:
                 raise BrigadeError(f"thread not replaced: could not raise the landing floor for {prefix}: {error}")
         with restaurant.checked():
             if next_owner(restaurant.meta, args.thread, args.replace, args.expect, args.stopped) != target:
                 continue
-            # Recording the same thread again is an ordinary write, so it keeps the fence.
             restaurant.unfenced = changing
             return seam.command(restaurant, args)

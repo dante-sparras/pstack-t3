@@ -94,10 +94,9 @@ def children_by_parent() -> dict[int, list[int]]:
         if entry.isdigit():
             try:
                 stat = Path("/proc", entry, "stat").read_bytes()
-                # The command name sits in parentheses and may itself hold spaces and parentheses.
                 parent = int(stat[stat.rindex(b")") + 2:].split()[1])
             except (OSError, ValueError, IndexError):
-                continue   # /proc gives no parent for it. It ended during the walk, or /proc hides it from this user.
+                continue
             children.setdefault(parent, []).append(int(entry))
     return children
 
@@ -110,9 +109,7 @@ class Watch:
         signal.signal(signal.SIGINT, self.note)
         signal.signal(signal.SIGTERM, self.note)
         listed = sys.platform.startswith("linux") and Path("/proc/self/stat").exists()
-        # The run started neither a child this process has now nor a process below such a child.
         self.inherited = listed and bool(children_by_parent().get(os.getpid()))
-        # With no child now, a process that is below this one later was started by the run or by a process the run started.
         self.adopts = listed and not self.inherited and adopt_orphans()
 
     def note(self, signum, frame) -> None:
@@ -128,7 +125,6 @@ class Watch:
                 exited = os.waitid(os.P_ALL, 0, os.WEXITED | os.WNOHANG | os.WNOWAIT)
             except ChildProcessError:
                 return
-            # The caller takes the status of a process in owned through its Popen, and the next pause goes on from there.
             if exited is None or exited.si_pid in owned:
                 return
             os.waitpid(exited.si_pid, 0)
@@ -151,13 +147,11 @@ class Watch:
                     os.kill(pid, signal.SIGKILL)
                     os.waitpid(pid, os.WNOHANG)
                 except (ProcessLookupError, PermissionError, ChildProcessError):
-                    pass   # it is gone, it belongs to another user, or it is not a child of this process
+                    pass
             time.sleep(POLL_SECONDS / 5)
 
 
 def child_env(environ: dict[str, str], home: Path, start: Path) -> dict[str, str]:
-    # shutil.get_terminal_size reads COLUMNS and LINES, argparse wraps help text at its width, and tests compare help text.
-    # A GIT_DIR or GIT_WORK_TREE from the caller names a repository that the git commands of a test then act on.
     env = {name: value for name, value in environ.items() if name not in ("COLUMNS", "LINES") and not name.startswith("GIT_")}
     env.update(TMPDIR=str(home / "tmp"), XDG_STATE_HOME=str(home / "state"), XDG_CONFIG_HOME=str(home / "config"))
     env[ACTIVE] = str(start)
@@ -167,8 +161,6 @@ def child_env(environ: dict[str, str], home: Path, start: Path) -> dict[str, str
 def start_child(args: list[str], home: Path, start: Path, lifeline: int | None = None) -> subprocess.Popen:
     for name in ("tmp", "state", "config"):
         (home / name).mkdir(parents=True)
-    # A file, not a pipe. A process that outlives its test cannot hold the runner's read open.
-    # preexec_fn runs in the child after the fork, so the request names the child process itself.
     with open(home / "output", "wb") as output:
         return subprocess.Popen([sys.executable, str(ENTRY), *args], cwd=start.parent,
                                 env=child_env(dict(os.environ), home, start), stdin=subprocess.DEVNULL,

@@ -17,9 +17,7 @@ $B fire --tickets ... --station <playbook> --summary "<outcome>" --timebox <minu
 $B ticket add --from-report reports/D1.md
 ```"""
 
-# Fixture for the regression tests in tests/test_skill_commands.py.
 
-# Quoted "..." fills from "...quoted". A bare "..." fills from "...bare".
 FILL = {
     "<request>": "Skill line request",
     "<outcome>": "Skill line outcome",
@@ -37,10 +35,7 @@ FILL = {
 }
 KIND_CHOICE = frozenset({"feature", "fix", "polish", "upkeep", "study"})
 RESTAURANT = "Perf"
-# open slugs --name. Report refs and the lease holder use that slug.
 SLUG = "perf"
-# open ignores --at and joins the store, the project directory's slug, and the restaurant slug.
-# "Bridge Kit" is the directory BrigadeTest uses, so the opened path is {store}/bridge-kit/perf.
 PROJECT_DIR = "Bridge Kit"
 PROJECT_SLUG = "bridge-kit"
 _PLACEHOLDER = re.compile(r"<[^>]*>")

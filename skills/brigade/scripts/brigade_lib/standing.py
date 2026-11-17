@@ -13,7 +13,6 @@ class _Standing:
     anchors: tuple
 
 
-# The standing rules, in the order the brief prints them.
 _RULES = (
     _Standing(
         "Save the full output of any failed test run to a file under <reports>/ before you rerun it, "

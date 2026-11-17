@@ -74,7 +74,6 @@ def watch(restaurant):
             target = restaurant.dir.parent / name
             handoff = handoff_id(restaurant.dir, ticket["id"])
             taken = taken_row(rails.get(target.resolve()), handoff)
-            # take writes the ticket before it deletes the file, so a missing file with no ticket was never delivered.
             if inbox_file(target, handoff).exists():
                 if taken is None:
                     lines.append(f"{ticket['id']}: moved to {name}, waiting for ticket take")
@@ -89,12 +88,9 @@ def watch(restaurant):
         ready = after_ready(restaurant.rows("rail.tsv"), waiting, {entry[0] for entry in inputs[0]})
         inputs = ([*inputs[0], *ready], *inputs[1:])
         workers = workers_line(restaurant.meta, inputs[1])
-        # A skipped seat is a restaurant-wide fact, not a dish line, so it sits between the two.
         skipped = skip_lines(restaurant)
         project_root = restaurant.meta.get("projectRoot", "")
         latest = _latest_trunk(restaurant.rows("log.tsv"))
-    # land.py waits on the landing database, so every call runs outside the store lock.
-    # The T3 run read also runs outside the lock for the same reason.
     try:
         runs, run_skip = _read_worker_runs(threads)
     except Exception as error:
@@ -124,7 +120,6 @@ def watch(restaurant):
         pending = debts[dish["id"]]
         found = list(progress.get(dish["id"], []))
         entry, submitted = entry_line(restaurant, dish) if dish["state"] in ("passed", "queued") else (None, False)
-        # A submitted entry owns the lease now, so a released lease is not a reason to claim again.
         if dish["lease"] and dish["state"] in LEASED_STATES and not submitted:
             line, ok = renew_line(restaurant, dish)
             answered = answered and ok
@@ -165,7 +160,6 @@ def watch(restaurant):
     if trunk_line:
         lines.append(trunk_line)
     if answered:
-        # walk --stale-hours then measures whether this coordinator still keeps its leases alive.
         restaurant.change_meta(lastActivityAt=seam.now())
     text = "\n".join([workers, *skipped, *([run_skip] if run_skip else []),
                       *(item_lines + lines or ["no work in progress"])])

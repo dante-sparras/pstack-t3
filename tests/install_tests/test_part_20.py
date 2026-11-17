@@ -167,7 +167,6 @@ class Part20Test(OwnershipCase):
             a, swarm = self.installed_for_grok()
             owner = owner_file(self.home, a)
             self.addCleanup(owner.parent.chmod, 0o755)
-            # Stands in for another program that changes the directory's mode between the read of the owner file and its removal.
             code = (
                 "real = module.write_claims\n"
                 "def write_claims(state, root, claims):\n"
@@ -183,7 +182,6 @@ class Part20Test(OwnershipCase):
     def test_an_uninstall_whose_owner_file_is_gone_before_it_is_removed_exits_0(self):
             a, swarm = self.installed_for_grok()
             owner = owner_file(self.home, a)
-            # Stands in for another program that removes the owner file between its read and its removal.
             code = (
                 "real = module.write_claims\n"
                 "def write_claims(state, root, claims):\n"

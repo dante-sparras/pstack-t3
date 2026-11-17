@@ -76,7 +76,6 @@ def run_pool(shards: list[Shard], jobs: int, timeout: float, launch_one, finish,
             pause({worker.proc.pid for worker in running})
             now = time.monotonic()
             for worker in list(running):
-                # Only a complete line that is an event moves the limit.
                 if worker.channel.read():
                     worker.progress_at = now
                 status = worker.proc.poll()
@@ -89,7 +88,6 @@ def run_pool(shards: list[Shard], jobs: int, timeout: float, launch_one, finish,
                     status, over = worker.proc.wait(), timeout
                 if status is None:
                     continue
-                # Ends the processes left in the worker's process group.
                 kill_group(worker.proc)
                 running.remove(worker)
                 finish(worker, Ended(status, over))
@@ -107,13 +105,13 @@ def make_scratch() -> Path:
     for entry in base.glob("run-tests-*"):
         parts = entry.name[len("run-tests-"):].split("-", 1)
         if len(parts) != 2 or not (parts[0].isascii() and parts[0].isdigit()) or not parts[1]:
-            continue   # a name that is not run-tests-<pid>-<suffix> names no process this run can judge
+            continue
         try:
             os.kill(int(parts[0]), 0)
         except (ProcessLookupError, OverflowError):
             shutil.rmtree(entry, ignore_errors=True)
         except OSError:
-            continue   # this user may not signal that process, so the run leaves its directory
+            continue
     return Path(tempfile.mkdtemp(prefix=f"run-tests-{os.getpid()}-", dir=base))
 
 
@@ -163,7 +161,6 @@ def run(start: Path, jobs: int, timeout: float, part: tuple[int, int] | None = N
                     settle(seq, verdict)
                 for problem in accounting.fixtures:
                     run_error(problem)
-                # Each entry is one way this shard did not finish cleanly.
                 faults = [accounting.ending] if accounting.ending else []
                 faults.extend(worker.channel.errors)
                 for seq, what in accounting.violations:

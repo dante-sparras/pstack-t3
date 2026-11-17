@@ -15,7 +15,6 @@ PROVIDERS = ("claude", "other")
 DEFAULT_PROVIDER = "claude"
 SETTINGS_RELATIVE = ".claude/settings.local.json"
 SETTINGS_KEY = "autoCompactWindow"
-# The git tree mode of the file sync_meta writes, whose temporary file is a regular file with no execute bit.
 SETTINGS_MODE = "100644"
 
 
@@ -201,7 +200,6 @@ def _load(project_root):
     refusal = _git_refusal(path, Path(project_root))
     if refusal:
         raise BrigadeError(refusal)
-    # realpath never raises on a symbolic link loop, which the read below then refuses with ELOOP.
     resolved = Path(os.path.realpath(path)) if path.is_symlink() else path
     if resolved != path:
         refusal = _git_refusal(resolved, Path(project_root))

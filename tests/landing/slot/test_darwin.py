@@ -78,12 +78,10 @@ class LandingTest(SlotBase, LandingTestBase):
             ("unknown witness", dict(mode="always", kills=True, probe="failed"), True),
             ("foreign uid", dict(mode="after-term", probe="foreign"), True),
             ("leader exits after a negative witness", dict(mode="always", kills=True, probe="waitid"), True),
-            # darwin False keeps the host platform, so this row reaches the Linux branch on a Linux host.
             ("linux", dict(mode="always", kills=True, probe="waitid"), False),
         )
         for label, options, darwin in rows:
             with self.subTest(witness=label):
-                # The stub kills the leader on every always row and the first SIGTERM kills the foreign row, so no command outlives the test.
                 result = self.run_exclusive(
                     ["slot", "--exclusive", "--", sys.executable, "-c", "import time; time.sleep(30)"],
                     cap=4, grace=0.05, timeout=20,
@@ -160,8 +158,6 @@ class LandingTest(SlotBase, LandingTestBase):
     def test_run_build_treats_darwin_eperm_for_a_witnessed_zombie_like_a_successful_killpg(self):
         """A timed out command reports no status when macOS refuses the killpg for an exited leader."""
         self.governor(1)
-        # The shell exits at once and leaves a member that holds the capture pipe, so the leader is an
-        # unreaped zombie when the killpg runs and the member ends on its own.
         command = f"{sys.executable} -c 'import time; time.sleep(2)' & exit 0"
         with mock.patch.object(land.sys, "platform", "darwin"), \
                 mock.patch.object(land.os, "killpg",

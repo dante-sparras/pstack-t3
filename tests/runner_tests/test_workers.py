@@ -70,7 +70,6 @@ class WorkersMixin:
         self.assertTrue(result.stderr.endswith("\n\nOK\n"), result.stderr)
 
     def test_a_worker_and_the_listing_get_a_home_inside_the_shard_home_and_a_guard_that_refuses_a_delete_beside_it(self):
-        # The fixture tree has no isolation prelude, so only the runner can have armed the guard.
         self.write("test_home_env.py", """
             import os
             import pwd

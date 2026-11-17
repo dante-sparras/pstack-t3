@@ -64,8 +64,6 @@ const ready = {
 
 void ready;
 
-// PR 179929's shape. Each assertion below stays a single short statement so a
-// reformat cannot drift the directive away from the line that actually errors.
 const refused = {
   kind: "allowed",
   basis: "rollup",

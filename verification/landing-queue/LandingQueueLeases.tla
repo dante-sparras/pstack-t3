@@ -1,33 +1,22 @@
 ---- MODULE LandingQueueLeases ----
-\* Moved from LandingQueue.tla unchanged: the lease helpers and the lease actions.
 EXTENDS LandingQueueBase
 
-\* ---------------------------------------------------------------------------
-\* Lease helpers.
-\* ---------------------------------------------------------------------------
 
-\* `_leases/store.py:in_flight`. A submitted lease counts whatever its expiry.
 Live(l) == leaseExpiry[l] > clock
 InFlight(l) == leaseState[l] = "submitted" \/ (leaseState[l] = "active" /\ Live(l))
 
 Overlaps(a, b) == a \cap b # {}
 
-\* `_leases/store.py:admission`.
 Clash(h, ps) == \E l \in Leases :
                   InFlight(l) /\ leaseHolder[l] # h /\ Overlaps(leasePaths[l], ps)
 Admitted(h, ps) == Break = "no-clash" \/ ~Clash(h, ps)
 
-\* `_leases/owner.py:check_owner`.
 Stale(h, g) == g < floor /\ PrefixOf(h) = "docs/"
 OwnerAllowed(h, g) == Break = "no-owner-check" \/ ~Stale(h, g)
 
-\* Lease rows take increasing ids, so a claim takes the lowest free one.
 FreeLease == CHOOSE l \in {m \in Leases : leaseState[m] = "free"} :
                \A m \in Leases : leaseState[m] = "free" => l <= m
 
-\* ---------------------------------------------------------------------------
-\* Leases.
-\* ---------------------------------------------------------------------------
 
 Claim(h, ps, ttl, g) ==
   /\ ps # {}
@@ -62,9 +51,6 @@ Release(l, g) ==
                  drainVars, tip, forgeVars, checkedAt, publishes, droppedCoverage,
                  trunkRewound, uncheckedMerge>>
 
-\* The kept expiry is the latest of its own expiry, the TTL when expired, and
-\* every folded expiry. Break = widen-drops-live-coverage is the code at the
-\* parent of commit 1adb24175, which took no folded expiry into account.
 Widen(l, ps, ttl, g) ==
   LET h      == leaseHolder[l]
       folded == {m \in Leases : m # l /\ leaseState[m] = "active" /\ Live(m) /\ leaseHolder[m] = h}

@@ -4,7 +4,6 @@ from brigade_lib import seam
 from brigade_lib._reviews.rounds import SEND_BACK_DAYS, _at_utc, earliest_record, item_verdicts, window_phrases
 from brigade_lib.store import EDITS_VERDICT, ROUND_KIND
 
-# The round-budget answers that accept the remaining findings instead of another round.
 ACCEPTING_ANSWERS = ("known limits", "drop")
 
 

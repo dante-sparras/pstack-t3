@@ -29,8 +29,6 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 SPEC = "LandingQueue.tla"
 
-# The versions this model was last checked with. Pinning both is what makes a
-# pass reproducible. Update them together with the wrapper, never alone.
 TLC_TOOL = (
     "http:tla2tools["
     "url=https://github.com/tlaplus/tlaplus/releases/download/v1.7.4/tla2tools.jar,"
@@ -39,10 +37,6 @@ TLC_TOOL = (
 )
 JAVA_TOOL = "java@temurin-25"
 
-# Use one worker and fingerprint polynomial index 0.
-# Fingerprinting does not eliminate collision risk. These configs check
-# invariants, not temporal liveness properties. Disable deadlock checking
-# because the bound in BoundNext leaves no enabled action at Depth.
 FLAGS = ["-workers", "1", "-fp", "0", "-lncheck", "final", "-nowarning", "-deadlock"]
 
 VIOLATED = re.compile(r"^Error: Invariant (\w+) is violated\.", re.MULTILINE)
@@ -131,7 +125,6 @@ def main(argv: list[str]) -> int:
         counts = STATES.search(output)
         generated = counts.group(1) if counts else "?"
         distinct = counts.group(2) if counts else "?"
-        # TLC counts the initial state as level 1. On a violation this is how far the search had got.
         levels = LEVELS.search(output)
         deepest = int(levels.group(1)) - 1 if levels else "-"
         if wanted:

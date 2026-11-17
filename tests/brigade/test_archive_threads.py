@@ -153,7 +153,6 @@ class ArchiveThreadsTest(BrigadeTest):
         self.assertEqual(worker[7], "")
 
     def test_dropped_dish_omits_replacement_thread_bound_during_lease_release(self):
-        # Covers a replacement bound during the lease release gap.
         self.started()
         self.brigade("dish", "D1", "--thread", THREAD_A)
         glob = run_globals(self, SCRIPT)
@@ -187,7 +186,6 @@ class ArchiveThreadsTest(BrigadeTest):
             self.assertEqual(end, "stamp")
 
     def test_dropped_dish_omits_a_reused_worker_id_bound_during_lease_release(self):
-        # Covers a reused id bound during the lease release: the rebind is not announced.
         self.started()
         self.brigade("dish", "D1", "--thread", THREAD_A)
         self.brigade("dish", "D1", "--thread", "")
@@ -216,7 +214,6 @@ class ArchiveThreadsTest(BrigadeTest):
         self.assertEqual(self.table_row(self.at, "dishes.tsv", "D1")["state"], "dropped")
 
     def test_dropped_dish_omits_a_reused_worker_id_rebound_then_cleared_during_lease_release(self):
-        # Covers a reused id whose rebound row outlives a cleared dish thread cell during the lease release.
         self.started()
         self.brigade("dish", "D1", "--thread", THREAD_A)
         self.brigade("dish", "D1", "--thread", "")

@@ -245,7 +245,6 @@ def link_health(harness, directory, names, scope, user):
             print(f"        {extra} also holds other copies of {len(stale)} of these "
                   f"({', '.join(stale[:5])}{'...' if len(stale) > 5 else ''}); {harness} may load those instead")
     if not user:
-        # Claude and Grok load the user copy when both scopes define a name.
         user_directory = layout.skill_dirs(None, True)[harness]
         shadowing = [name for name in installed if (user_directory / name).exists() and not points_here(user_directory / name)]
         if shadowing:

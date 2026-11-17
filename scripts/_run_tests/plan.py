@@ -181,7 +181,6 @@ def build_shards(plan: tuple[Test, ...], size: int = SHARD_SIZE) -> list[Shard]:
     shards = []
     for module, seqs in sorted(modules.items(), key=lambda item: -len(item[1])):
         count = math.ceil(len(seqs) / size)
-        # When a module needs more than one shard, a stride puts neighbours in discovery order in different shards.
         for offset in range(count):
             mine = tuple(seqs[offset::count])
             shards.append(Shard(len(shards) + 1, module, mine, tuple(by_seq[seq].cls for seq in mine)))

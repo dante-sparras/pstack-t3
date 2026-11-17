@@ -30,7 +30,6 @@ WORK_SUMMARY = "Add a second work line"
 SMOKE_THREAD = "smoke-thread"
 SMOKE_OWNER = SMOKE_THREAD + "@1"
 LAND_OWNER = "smoke/@1"
-# One prep command writes a file whose text is its second argument.
 WRITER = "import sys\nopen(sys.argv[1], 'w', encoding='utf-8').write(sys.argv[2])\n"
 
 

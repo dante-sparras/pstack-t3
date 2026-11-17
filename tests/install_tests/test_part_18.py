@@ -243,7 +243,6 @@ class Part18Test(OwnershipCase):
             a, env, actual, recorded, line = self.two_harness_directories()
             second_name = actual / ".pstack-t3-probe" / "swarm"
             swarm, held = self.second_name_and_held_backup(second_name)
-            # A mount of the recorded <harness> directory at the one under the state directory gives the two one device and inode. The hook makes os.path.samestat true for that pair with no mount.
             code = (
                 f"os.environ['XDG_CONFIG_HOME'] = {env['XDG_CONFIG_HOME']!r}\n"
                 f"pair = {{(found.st_dev, found.st_ino) for found in (os.stat({str(actual)!r}), os.stat({str(recorded)!r}))}}\n"
@@ -260,7 +259,6 @@ class Part18Test(OwnershipCase):
             """Run checkout a's install with a first step that runs `breaks` on the manifest path and then `fails`. Return the run and the manifest path."""
             a = make_checkout(self.home, "a")
             manifest = legacy_file(self.home)
-            # Stands in for a step that fails while another program rewrites the manifest or changes its mode between the step's record and its undo.
             code = (
                 "import errno\n"
                 "def act(step, root):\n"

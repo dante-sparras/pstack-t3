@@ -95,7 +95,6 @@ def validate(config, catalog, exclude=(), backups=None):
     for number, rule in enumerate(exclude, 1):
         problems.extend(exclude_option_problems(number, rule, catalog))
     skill_seats = None
-    # Older callers pass a config without mode; the write path now passes the merged mode.
     decision = effective_mode(config) if "mode" in config else "full"
     mode = decision.mode if isinstance(decision, ModeDecision) else decision
     for name, seats in config["roles"].items():
@@ -109,7 +108,6 @@ def validate(config, catalog, exclude=(), backups=None):
                 problems.append(f"{name}: {shortfall}")
             continue
         resolved = []
-        # A config with no allowByFile carries no allow list; the write path now passes per-file lists.
         allow = role_allow(config, name) if "allowByFile" in config else None
         for seat in seats:
             try:

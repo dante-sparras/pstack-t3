@@ -46,8 +46,6 @@ def _drop_cached_brigade(*names):
 _prior_brigade = {n: m for n, m in _sys.modules.items() if n == "brigade_lib" or n.startswith("brigade_lib.")}
 _drop_cached_brigade("brigade_lib")
 _pkg = "_brigade_ns_" + _uuid.uuid4().hex
-# The alias keeps a unique name so seam metadata cannot resolve to a restored prior package.
-# Spend is registered under both names so the file executes once.
 _alias = _types.ModuleType(_pkg)
 _alias.__path__ = [str(_libdir)]
 _sys.modules[_pkg] = _alias
@@ -83,7 +81,6 @@ finally:
     _sys.modules.update(_prior_brigade)
 del _bw, _drop_cached_brigade, _pkg, _alias, _libdir, _types, _uuid, _prior_brigade
 
-# next sets this. A write or a land.py call then raises instead of changing a store.
 READ_ONLY = False
 LAND = Path(__file__).resolve().parents[2] / "landing" / "scripts" / "land.py"
 BUILT_ROLES = Path(__file__).resolve().parents[2] / "pstack-runtime" / "scripts" / "roles.py"

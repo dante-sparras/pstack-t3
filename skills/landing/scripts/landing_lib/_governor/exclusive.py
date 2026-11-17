@@ -101,8 +101,6 @@ def _killpg_like_linux(process, sig):
     if sys.platform != "darwin":
         os.killpg(process.pid, sig)
         return
-    # Witness first. A permitted zombie found after the attempt cannot establish permission for it.
-    # A leader that exits in the gap before killpg is a conservative miss, and the original EPERM is raised again.
     witness = _leader_is_permitted_zombie(process.pid)
     try:
         os.killpg(process.pid, sig)
@@ -131,7 +129,6 @@ def exclusive_command(command, repo, for_text, reason_text):
     def stop_group(process):
         if process.returncode is not None:
             return
-        # The unreaped leader is how SIGKILL stays on this command's group. Its pid is the process group id, and a zombie holds that pid until it is reaped, so the kernel cannot reuse the id for another process group.
         try:
             try:
                 _killpg_like_linux(process, signal.SIGTERM)
@@ -156,7 +153,6 @@ def exclusive_command(command, repo, for_text, reason_text):
                         break
                     seam._real_sleep(min(0.05, remaining))
             else:
-                # Nothing here reaps, so a leader that exits stays a zombie through the grace.
                 while True:
                     if not _pid_reserved(process.pid):
                         _finish_reaped(process)
@@ -188,7 +184,7 @@ def exclusive_command(command, repo, for_text, reason_text):
         try:
             seam._exclusive_ready_ack()
             if hasattr(process, "_sigint_wait_secs"):
-                process._sigint_wait_secs = 0  # CPython waits 0.25s on SIGINT after setsid, and the child did not see that signal.
+                process._sigint_wait_secs = 0
             remaining = seconds - (seam._cap_monotonic() - acquired)
             try:
                 wait_with_real_sleep(process, max(0.0, remaining))

@@ -130,7 +130,6 @@ class LandingTest(InProcessBase, LandingTestBase):
             return os.readlink(f"/proc/self/fd/{descriptor}").encode()
 
         try:
-            # Linux fcntl has no F_GETPATH, so the seam names its own command.
             with mock.patch.multiple(fcntl, fcntl=get_path, F_GETPATH=9999, create=True), \
                     mock.patch.object(_descriptors_module, "_open_fd_directory", labeled_directory):
                 before = _descriptors()

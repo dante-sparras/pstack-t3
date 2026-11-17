@@ -49,7 +49,6 @@ def build_line(store, integration, out):
     trunk = seam.fetch_trunk(store)
     line = seam.line_of(store, trunk)
     tip, todo = line.tip, line.stale + seam.unheld_queued(store)
-    # Under merge method rebase GitHub replays every commit of a pull request, so no entry is built on another.
     if seam.merge_method(store) == "rebase":
         todo = todo[:1] if len(store.entries("awaiting-merge")) == len(line.stale) else []
     for entry in todo:

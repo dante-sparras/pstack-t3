@@ -78,7 +78,6 @@ class StoreFaultsBase:
                 return original_run(*args, **kwargs)
 
             def watching_popen(*args, **kwargs):
-                # subprocess.run calls Popen for the same command. Record a direct Popen only.
                 if depth["n"] and inspect.stack()[1].function != "run":
                     record(args[0] if args else kwargs.get("args"))
                 return original_popen(*args, **kwargs)

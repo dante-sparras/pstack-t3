@@ -143,7 +143,6 @@ class FireRideMixin:
         self.assertEqual(self.store_files(), before)
 
     def test_fire_refuses_a_ride_along_ticket_of_a_paused_goal_and_starts_no_item(self):
-        # The lead ticket T4 has no goal and the rider T5 is under paused G1, so the fire must read both.
         self.queue()
         self.goal("activity view")
         self.filed("a", "--paths", "a.txt", "--goal", "G1")

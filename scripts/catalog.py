@@ -18,9 +18,7 @@ GROUPS = [
     ("Principles", lambda name: name.startswith("principle-")),
 ]
 BULLET = re.compile(r"^- \*\*(.+?)\.\*\* (.+)$", re.M)
-# A bullet gives its file as a backticked playbooks/<name>.md that ends the bullet, with or without a "File: " lead-in.
 GIVEN_FILE = re.compile(r"\s*(?:File: )?`(playbooks/[\w-]+\.md)`\.?$")
-# Upstream since 0.15.43 names every playbook on one line, as in "Investigation, Bug fix, Opening a PR."
 TITLE_LIST = re.compile(r"[A-Z][A-Za-z -]*(?:, [A-Z][A-Za-z -]*)+\.")
 
 

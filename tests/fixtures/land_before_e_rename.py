@@ -115,7 +115,6 @@ def changed_paths(repo, base, head):
     return [p for p in git("diff", "-z", "--name-only", "--no-renames", base, head, cwd=repo).stdout.split("\0") if p]
 
 
-# Governor
 
 
 def governor_dir():
@@ -193,14 +192,12 @@ def supervised(command, cwd, timeout):
         try:
             output, _ = process.communicate(timeout=5)
         except subprocess.TimeoutExpired:
-            # A descendant left the group with setsid and still holds the pipe. Stop waiting for it.
             process.stdout.close()
             process.wait()
             output = b""
         return None, output.decode("utf-8", "replace")
 
 
-# Store
 
 
 class Store:
@@ -440,8 +437,6 @@ class Integration:
         spec = f"{entry['base']}..{pin_ref(entry['sha'])}"
         identity = committer(self.path)
         result = self.git(*identity, "-c", "rerere.enabled=false", "cherry-pick", spec, check=False)
-        # git 2.43 has no cherry-pick --empty=drop. Git added it in 2.45. Drop a commit that
-        # became empty, and stop on a commit that started empty. That matches --empty=drop.
         if result.returncode != 0:
             counted = self.git("rev-list", "--count", spec, check=False)
             remaining = int(counted.stdout.strip() or "0") if counted.returncode == 0 else 0
@@ -1008,7 +1003,6 @@ def poll_human(store):
             if blocker == "review":
                 pause_for_review(store, entry["pr"], detail, disarm=True, armed=armed)
             continue
-        # A merge command can return before pr view reports MERGED.
         reads = 4 if request_merge(store, entry["id"], entry["pr"]) else 1
         entry = entry_row(store, entry["id"])
         if entry["state"] == "bounced":

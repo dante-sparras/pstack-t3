@@ -185,7 +185,6 @@ class Part05Test(OwnershipCase):
                     a = make_checkout(self.home, "a")
                     self.ok(run(self.home, a, "--harness", "grok"))
                     parent = provider_link(self.home, "grok", "swarm").parent
-                    # Two planted entries already hold the colliding names.
                     plant = (
                         "import secrets, tempfile\n"
                         "secrets.token_hex = lambda n: 'deadbeef'\n"

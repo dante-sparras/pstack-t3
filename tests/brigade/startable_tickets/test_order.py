@@ -84,7 +84,6 @@ class OrderAgreementMixin:
         ]))
 
     def test_startable_does_not_block_on_a_lease_whose_only_match_is_the_next_change_note(self):
-        # Before the fix, the preview matched this ticket only through the note it named for the next dish.
         self.note_lease_fixture()
         self.assertEqual(self.brigade("startable"), "\n".join([
             self.NONE_RUNNING,
@@ -97,7 +96,6 @@ class OrderAgreementMixin:
         self.note_lease_fixture()
         self.assertIn("T1 normal fix, 0m: startable; tests/brigade/support.py,tests/brigade/test_startable.py",
                       self.brigade("startable"))
-        # The branch is the coordinator's choice, so the note `fire` claims is not the note the lease holds.
         self.assertEqual(self.brigade("fire", "--tickets", "T1", "--station", "bug-fix", "--summary", "Fix the cap",
                                       "--paths", "tests/brigade/support.py,tests/brigade/test_startable.py",
                                       "--branch", "perf/d2"),

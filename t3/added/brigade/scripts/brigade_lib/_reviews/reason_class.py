@@ -5,7 +5,6 @@ from brigade_lib.store import REASONS
 
 REASON_LINE = re.compile(r"^Reason:[ \t]*(\S+)[ \t]*$", re.M)
 
-# A fence delimiter: up to three leading spaces, then three or more backticks or tildes.
 _FENCE = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
 _CLOSE = re.compile(r"^ {0,3}(`{3,}|~{3,})[ \t]*$")
 

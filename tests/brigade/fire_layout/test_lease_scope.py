@@ -80,14 +80,12 @@ class LeaseScopeMixin:
         self.assertIn("paths overlap L1 held by perf/D2", refused)
 
     def test_startable_blocks_the_second_scope_when_only_the_first_saved_scope_holds_the_repository_root(self):
-        # Only the first saved scope holds the root, so the overlap needs scopes_overlap, not paths_overlap.
         text = self.saved_scope_pair(".,t1.txt", "t2.txt")
         self.assertIn("waiting tickets: 2, startable: 1, blocked: 1", text)
         self.assertIn("T1 normal fix, 0m: startable; .,t1.txt", text)
         self.assertIn("T2 normal fix, 0m: blocked, starts after T1; t2.txt", text)
 
     def test_startable_blocks_the_second_scope_when_only_the_second_saved_scope_holds_the_repository_root(self):
-        # Only the second saved scope holds the root, so the overlap needs scopes_overlap, not paths_overlap.
         text = self.saved_scope_pair("t1.txt", ".,t2.txt")
         self.assertIn("waiting tickets: 2, startable: 1, blocked: 1", text)
         self.assertIn("T1 normal fix, 0m: startable; t1.txt", text)

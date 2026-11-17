@@ -102,17 +102,12 @@ class ReportingTest(BrigadeTest):
     def test_goal_list_prints_for_each_goal_the_counts_a_hand_join_of_the_three_tables_gives(self):
         self.worked_store()
         self.assertEqual(self.brigade("goal", "list").splitlines(), [
-            # 2 waiting. T4 and T9 wait under G1. 1 in flight. D2 is in review under G1. 1 merged. D1.
-            # 3 send-backs. Two on D1 and one on D2. The D2 row with member yes does not count.
             "G1 open activity view: 2 waiting, 1 in flight, 1 merged, 3 send-backs, share 2",
             "  purpose: One page of activity",
             "  done when: The page ships",
-            # 0 waiting. T3 and T6 are under G2 and assigned. 1 in flight. D3 is sent back under G2. 0 merged.
-            # 1 send-back. One on D3. Its pass-with-edits row does not count. 1 riding along. T3, assigned to D2, a G1 item.
             "G2 paused current with upstream: 0 waiting, 1 in flight, 0 merged, 1 send-back, 1 riding along",
             "  purpose: One page of activity",
             "  done when: The page ships",
-            # 2 waiting. T5 and T8. 1 in flight. D4. 1 merged. D5. 1 send-back. One on D5.
             "unassigned: 2 waiting, 1 in flight, 1 merged, 1 send-back",
         ])
     def test_status_prints_the_waiting_and_in_flight_counts_by_kind_and_by_goal_a_hand_join_gives_after_its_workers_line(self):
@@ -122,12 +117,8 @@ class ReportingTest(BrigadeTest):
             "reporting: milestones, no landing contract, waiting tickets: 4, in progress: 1, in review: 1, sent back: 1, merged: 2",
             "workers: 2 of 9 running, 7 idle, auto-start: normal",
             "liveness: every 600000 ms (default for milestones)",
-            # feature. T9 waits. fix. T4 waits and D2 is in flight. polish. T5 waits, and T3 is assigned so it is in no entry.
-            # upkeep. D3 is in flight. study. D4 is in flight.
             "kinds: feature 1 waiting; fix 1 waiting, 1 in flight; polish 1 waiting; upkeep 1 in flight; study 1 in flight",
-            # G1. T4 and T9 wait and D2 is in flight. G2. D3 is in flight. unassigned. T5 and T8 wait and D4 is in flight.
             "goals: G1 2 waiting, 1 in flight; G2 paused, 1 in flight; unassigned 2 waiting, 1 in flight",
-            # T8 waits with no kind. The waiting counts by kind and this one sum to the 4 waiting tickets.
             "untagged: 1",
         ])
     def test_status_prints_no_kinds_line_no_goals_line_and_no_untagged_line_when_no_ticket_waits_and_no_item_is_in_flight(self):
@@ -169,7 +160,6 @@ class ReportingTest(BrigadeTest):
             self.brigade("ticket", "add", "--summary", summary, "--kind", "fix", "--goal", "G1")
         self.brigade("fire", "--tickets", "T3", "--station", "bug-fix", "--summary", "Do c")
         self.brigade("fire", "--tickets", "T4", "--station", "bug-fix", "--summary", "Do d")
-        # Per table, the row whose cell is padded, and a command that rewrites the table to change another row.
         rewrites = {"rail.tsv": ("T1", lambda cell: ("ticket", "set", "T2", "--paths", f"docs/{cell}")),
                     "dishes.tsv": ("D1", lambda cell: ("dish", "D2", "--thread", f"thread-{cell}")),
                     "goals.tsv": ("G1", lambda cell: ("goal", "set", "G2", "--name", f"renamed {cell}"))}
@@ -221,7 +211,6 @@ class ReportingTest(BrigadeTest):
     def test_goal_list_on_a_store_from_before_kinds_counts_each_ticket_and_item_as_unassigned_and_writes_nothing(self):
         self.store_from_before_kinds()
         before = self.store_files()
-        # Waiting. T8 to T12. In flight. D1 to D6. Merged. D7. Send-backs. The one row on D4.
         self.assertEqual(self.brigade("goal", "list"),
                          "no open or paused goals\nunassigned: 5 waiting, 6 in flight, 1 merged, 1 send-back")
         self.assertEqual(self.store_files(), before)

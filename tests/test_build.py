@@ -39,7 +39,6 @@ CASES = (
         0o755,
     ),
     ("t3/scripts/roles.py", "pstack-runtime/scripts/roles.py", None),
-    # Covers the 12 split files today.
     *(
         (
             f"t3/scripts/_roles/{p.name}",
@@ -109,7 +108,6 @@ class BuildModeTest(unittest.TestCase):
     def test_a_read_only_copy_builds_the_same_files_and_modes_as_a_writable_one(self):
         if hasattr(os, "geteuid") and os.geteuid() == 0:
             self.skipTest("read-only modes do not stop root writes")
-        # The override layer copies arena/SKILL.md over the file the vendor layer wrote.
         for rel in ("vendor/pstack/skills/arena/SKILL.md", "t3/overrides/arena/SKILL.md"):
             self.assertTrue((ROOT / rel).is_file(), rel)
 

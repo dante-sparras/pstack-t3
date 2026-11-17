@@ -7,8 +7,6 @@ on:
 
 env:
   PSTACK_TEST_REAL_PROCESS: '1'
-  # Chromium puts its SingletonSocket under TMPDIR and the probe models a 107-character limit. The macOS
-  # runner's default TMPDIR is a long /var/folders path, and the isolated test run root sits under it.
   TMPDIR: /tmp
 
 concurrency:
@@ -16,7 +14,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Parts 1 to 8 of 8. Run on a pull request only. A step failure fails this job. test (3.10) lists part_310_1 through part_310_8 in needs and requires success on pull_request and skipped on push.
   part_310_1:
     name: part (3.10, 1/8)
     runs-on: ubuntu-latest
@@ -121,7 +118,6 @@ jobs:
       - run: pip install pyyaml
       - run: python3 scripts/run_tests.py --part 8/8
 
-  # Parts 1 to 8 of 8. Run on a pull request only. A step failure fails this job. test (3.12) lists part_312_1 through part_312_8 in needs and requires success on pull_request and skipped on push.
   part_312_1:
     name: part (3.12, 1/8)
     runs-on: ubuntu-latest
@@ -295,7 +291,6 @@ jobs:
           git diff --exit-code -- skills docs/skills.md docs/cli
           test -z "$(git status --porcelain -- skills docs/skills.md docs/cli)"
 
-  # Browser probe for Linux. Runs on a pull request only. The Linux part jobs skip the probe. test (3.10) and test (3.12) list browser_linux in needs and require success on pull_request and skipped on push.
   browser_linux:
     name: browser (linux)
     runs-on: ubuntu-latest
@@ -329,7 +324,6 @@ jobs:
           printf '%s\n' "$browser"
           "$browser" --version
 
-  # Browser probe for macOS. Runs on a push only. The macOS part jobs skip the probe. test (3.12) lists browser_macos in needs and requires success on push and skipped on pull_request.
   browser_macos:
     name: browser (macOS)
     runs-on: macos-latest
@@ -343,7 +337,6 @@ jobs:
       - run: pip install pyyaml
       - *select_browser
 
-  # Part 1 of 4. Runs on a push only. A step failure fails this job. test (3.12) lists macos_312_1 in needs and requires success on push and skipped on pull_request.
   macos_312_1:
     name: macOS (3.12, 1/4)
     runs-on: macos-latest
@@ -369,7 +362,6 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           exit "$status"
 
-  # Part 2 of 4. Runs on a push only. A step failure fails this job. test (3.12) lists macos_312_2 in needs and requires success on push and skipped on pull_request.
   macos_312_2:
     name: macOS (3.12, 2/4)
     runs-on: macos-latest
@@ -395,7 +387,6 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           exit "$status"
 
-  # Part 3 of 4. Runs on a push only. A step failure fails this job. test (3.12) lists macos_312_3 in needs and requires success on push and skipped on pull_request.
   macos_312_3:
     name: macOS (3.12, 3/4)
     runs-on: macos-latest
@@ -421,7 +412,6 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           exit "$status"
 
-  # Part 4 of 4. Runs on a push only. A step failure fails this job. test (3.12) lists macos_312_4 in needs and requires success on push and skipped on pull_request.
   macos_312_4:
     name: macOS (3.12, 4/4)
     runs-on: macos-latest

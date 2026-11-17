@@ -38,7 +38,6 @@ class AfterTicketTest(BrigadeTest):
         self.open()
         self.write_populated_old_rail()
         old = [line.split("\t") for line in (self.at / "rail.tsv").read_text().splitlines()[1:]]
-        # The fixture's decision cell is set, so startable counts both rows as decisions and none as blocked on a dependency.
         self.assertEqual(self.brigade("startable").splitlines()[1], "waiting tickets: 2, decisions: 2")
         self.assertEqual(self.brigade("ticket", "set", "T1", "--priority", "low"), "T1 priority low")
         lines = (self.at / "rail.tsv").read_text().splitlines()

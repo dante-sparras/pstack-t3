@@ -10,19 +10,15 @@ HEADING = re.compile(r"(#{1,6}) (?!(?:.*[ \t])?#+$)(\S(?:.*\S)?)")
 
 FILE_LINE = re.compile(r"File: `([^` ][^`]*)`(?!`)")
 LABELS = {"Old text:": "old", "New text:": "new"}
-# The marks edit_mark gives the five parts of one edit that one_edit reads, in the only order it reads them.
 EDIT_MARKS = ["file", "old", "fence", "new", "fence"]
 BLANK = re.compile(r"[ \t]*")
-# What a block quote, a list item, and indentation put in front of a line's text.
 NESTED = re.compile(r"[ \t]*(?:(?:>|(?:[-+*]|[0-9]{1,9}[.)])(?=[ \t]))[ \t]*)*")
 UNDERLINE = re.compile(NESTED.pattern + r"(?:=+|-+)[ \t]*")
-# What starts a line outside a fence that HEADING does not match and report_parts refuses. Each key is a key of EDITS_REFUSED.
 UNREAD = (
     ("fence", re.compile(r"(?![`~])" + NESTED.pattern + r"(?:`{3}|~{3})")),
     ("heading", re.compile(NESTED.pattern + r"#{1,6}(?:[ \t]|$)")),
     ("html", re.compile(r" {0,3}<[A-Za-z/!?]")),
 )
-# Why parse_edits refuses a review report's edits. Each value finishes the words `reports/<name>`.
 EDITS_REFUSED = {
     "none": " holds no edit under a ## Edits heading",
     "return": " holds a carriage return",

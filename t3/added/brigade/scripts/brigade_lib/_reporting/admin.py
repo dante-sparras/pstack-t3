@@ -205,7 +205,6 @@ def sync(admin):
                                          "note": json.dumps(row, separators=(",", ":"))})
                 if row["kind"] != "doc":
                     lines.append(f"{name} {row['at']} {row['kind']} {row['id']} {row['state']}: {row['note']}")
-            # A sync that started later may have read further and moved this cursor already.
             cursors[store] = max(end, int(cursors.get(store, 0)))
         admin.change_meta(cursors=cursors, lastActivityAt=seam.now())
     return "\n".join(lines), failures

@@ -127,7 +127,6 @@ TABLES = {
     "log.tsv": ("at", "kind", "id", "state", "note"),
     "edits.tsv": ("at", "dish", "from", "to", "report"),
     "goals.tsv": ("id", "at", "state", "name", "purpose", "done", "share", "closed"),
-    # Only the executive admin's store has this table.
     "rulings.tsv": ("id", "at", "kind", "parties", "question", "rule", "decision", "supersedes", "state"),
 }
 

@@ -76,7 +76,6 @@ class FieldsContractMixin:
         self.open()
         self.fire_one()
         self.brigade("set", "--thread", "thread-coord")
-        # race between two processes
         waiting = real_popen(
             ProcessReason.RACE,
             [sys.executable, str(SCRIPT), "--store", str(self.store), "--at", str(self.at),
@@ -88,7 +87,6 @@ class FieldsContractMixin:
             self.assertIsNone(waiting.poll())
             others = []
             for args in (("status",), ("watch",), ("ticket", "add", "--kind", "fix", "--summary", "second")):
-                # race between two processes
                 others.append(real_popen(
                     ProcessReason.RACE,
                     [sys.executable, str(SCRIPT), "--store", str(self.store), "--at", str(self.at),

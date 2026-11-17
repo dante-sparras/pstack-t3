@@ -145,12 +145,10 @@ def shell_word(text):
 def refuse_stray_worktree(common):
     """Stop when the common config file sets core.worktree to a non-empty value where git does not find this repository."""
     config = common / "config"
-    # -z ends the value with a NUL, so a newline before the NUL belongs to the value.
     value = git(*IGNORE_CORE_WORKTREE, "config", "--file", str(config), "-z", "--get", "core.worktree",
                 cwd=common, check=False, exact=True).stdout.removesuffix("\0")
     if not value:
         return
-    # git resolves a relative core.worktree against the git directory.
     found = git("-C", os.path.join(common, value), "rev-parse", "--path-format=absolute", "--git-common-dir",
                 cwd=common, check=False, exact=True)
     if found.returncode != 0 or Path(found.stdout.removesuffix("\n")).resolve() != common:
@@ -163,7 +161,6 @@ def common_dir(path):
     found = git(*IGNORE_CORE_WORKTREE, "rev-parse", "--path-format=absolute", "--git-common-dir", cwd=path, exact=True)
     common = Path(found.stdout.removesuffix("\n")).resolve()
     refuse_stray_worktree(common)
-    # Require git rev-parse --show-toplevel to succeed.
     git("rev-parse", "--show-toplevel", cwd=path)
     return common
 

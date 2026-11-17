@@ -77,8 +77,6 @@ class LandingTest(SlotBase, LandingTestBase):
         governor.mkdir(parents=True)
         (governor / "governor.json").write_text(json.dumps({"slots": 2}))
         marks = self.base / "marks"
-        # land.py's slot gate reads LAND_SLOT. The queue sets it around this suite, so the
-        # subprocesses under test must not inherit it. The nested command still sets it itself.
         env = {key: value for key, value in os.environ.items() if key != "LAND_SLOT"}
         worker = real_popen(
             ProcessReason.GOVERNOR,
@@ -157,7 +155,6 @@ class LandingTest(SlotBase, LandingTestBase):
         try:
             for path in [*releases, retry]:
                 os.mkfifo(path)
-                # Keep both ends open so a barrier write never waits for a reader.
                 handles.append(os.open(path, os.O_RDWR | os.O_NONBLOCK))
             for directory in directories:
                 directory.mkdir()

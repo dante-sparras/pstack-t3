@@ -93,7 +93,6 @@ class ContractReadRaceTest(BrigadeTest):
         return check, swapped
 
     def test_a_writer_that_replaces_a_multipage_check_mid_read_never_leaves_a_spliced_command_fails_when_the_read_takes_no_lock(self):
-        # Processes: git names the project's common directory, as the lookup runs it too.
         self.git_project()
         self.landing_env()
         path = self.queue(self.common_dir(), self.OLD_CHECK)

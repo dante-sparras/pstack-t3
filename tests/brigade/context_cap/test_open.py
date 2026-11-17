@@ -138,7 +138,6 @@ class CapOpenMixin:
         self.assertEqual(self.open_cap("--intake", "github", code=1), refusal)
         self.assertFalse(self.at.exists())
         self.assertEqual(list((self.store / "bridge-kit").iterdir()), [])
-        # No coordinator claimed github, so the next open reaches the same refusal instead of an intake dispute.
         self.assertEqual(self.run_at(self.store / "bridge-kit" / "replacement",
                                      "open", "--project-root", str(self.project), "--name", "Replacement",
                                      "--context-cap", "300000", "--intake", "github", code=1), refusal)

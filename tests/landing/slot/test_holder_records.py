@@ -118,7 +118,6 @@ class LandingTest(SlotBase, LandingTestBase):
         holds = land.governor_dir() / "holds"
         holds.mkdir(parents=True, exist_ok=True)
         record = holds / "worker-0"
-        # The reader names a record only while its writer holds the record's own lock, so lock it.
         writer = os.open(record, os.O_RDWR | os.O_CREAT | os.O_TRUNC, 0o666)
         fcntl.flock(writer, fcntl.LOCK_EX | fcntl.LOCK_NB)
         try:
@@ -263,7 +262,6 @@ class LandingTest(SlotBase, LandingTestBase):
         directory.mkdir()
         marker, release = directory / "probe", directory / "release"
         os.mkfifo(release)
-        # Keep both ends open so the write that resumes the probe never waits for a reader.
         gate = os.open(release, os.O_RDWR | os.O_NONBLOCK)
         self.addCleanup(os.close, gate)
         reporter = real_popen(
@@ -292,14 +290,7 @@ class LandingTest(SlotBase, LandingTestBase):
         self.assertFalse(landing.started)
 
         os.write(gate, b"x")
-        # The probe unlocks the free slot inside its slow_busy probe and returns, and only after that
-        # does _admit unlock the turn mutex the landing caller is blocked on. Settling the landing
-        # caller before the probe is stopped keeps that order, so its first attempt wakes with the
-        # free slot already released and yields to the earlier exclusive instead of starting.
         self.assertEqual(slots.settle(landing), "waiting")
-        # Stopping the probe before that attempt leaves when each lock is released up to the
-        # kernel, so the attempt can land on either side of the free slot's release. On the
-        # early side it takes landing-0 instead of yielding to the earlier exclusive.
         stop_reporter()
         self.assertEqual(slots.step(exclusive), "started")
         self.assertFalse(landing.started)

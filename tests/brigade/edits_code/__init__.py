@@ -1,4 +1,3 @@
-# The refusal edits verify prints when the applied change counts more than the cap, with the count filled in.
 def cap_refusal(count):
     return ("brigade: the applied change counts {count} lines, and a small code fix counts at most 20; it needs a "
             "second review. The count is, for each changed file, the largest added plus deleted total git diff "

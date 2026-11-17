@@ -151,7 +151,6 @@ def expanded_paths(tickets, gen_map):
         seen = set()
         for raw in ticket.paths:
             made = _claim_norm(raw)
-            # An empty string is the whole repository, so keep it; only an escaping path reads as None.
             if made is None or made in seen:
                 continue
             seen.add(made)

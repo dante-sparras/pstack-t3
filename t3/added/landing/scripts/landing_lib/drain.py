@@ -113,7 +113,6 @@ def report(store, out):
 def holder_rows(store, holder, sha=None):
     """The rows of one holder, or of every holder under a prefix that ends in /, optionally only those at one commit."""
     if sha:
-        # submit stores the full SHA rev-parse gives, so a short or uppercase SHA compares the same way.
         resolved = seam.git("rev-parse", "--verify", "--quiet", f"{sha}^{{commit}}", cwd=store.repo, check=False)
         sha = resolved.stdout.strip() if resolved.returncode == 0 else sha.lower()
     return [

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Replace vendor/pstack with a newer upstream revision and report override drift.
 
+Except under --check, the sync deletes every code comment from the upstream tree with scripts/comments.py before it compares,
+merges, or copies anything, so vendor/pstack and the merge inputs hold upstream without its comments.
+
 After syncing, `python3 scripts/build.py` lists every override and persona whose
 upstream file changed. Re-port each one, then run `build.py --update-lock`.
 
@@ -70,14 +73,12 @@ MERGE_DETAIL = {
 }
 DRY_RUN_DETAIL = {**MERGE_DETAIL, "clean": "would merge"}
 SAVED_SUFFIX = ", git's marked merge is in {path}"
-# Without -L, git ends each <<<<<<< and >>>>>>> line with a path it was given, and the new upstream file is in a temporary directory.
 MERGE_LABELS = ("override", "old upstream", "new upstream")
 MERGE_FOOTER = """\
 t3/overrides.lock.json is not refreshed.
 A clean merge is not a reviewed port, because upstream's new lines can hold a Cursor mechanism.
 Once the merges are written, review each merged override or persona and re-port each override or persona whose row says so. Then run python3 scripts/build.py --update-lock, which runs the build's Cursor-leftover check.
 """
-# No "=======" here. That line also underlines a Markdown heading, and git writes it only between a "<<<<<<<" line and a ">>>>>>>" line.
 MARKER_LINE = re.compile(rb"^(?:<{7}|>{7}|\|{7})", re.MULTILINE)
 FIXED_COPIES = {
     "pstack-runtime/SKILL.md": "runtime.md",
@@ -130,7 +131,6 @@ def run(*command, cwd=None):
 
 
 def load_layers():
-    # Importing build would otherwise leave scripts/__pycache__ in the checkout.
     sys.dont_write_bytecode = True
     sys.path.insert(0, str(ROOT / "scripts"))
     import build
@@ -267,7 +267,6 @@ def merge_file(current, base, other):
 
 
 def outcome(row, kind, merged=None, marked=None):
-    # t3_path is both the row the sync prints and the file the merge lands in.
     return Outcome(row.t3_path, row.conflict_rel, kind, merged, marked)
 
 
@@ -302,7 +301,6 @@ def plan_merges(old_root, new_root, lock):
 
 
 def apply(outcomes, t3):
-    # Staged beside the lock, so a crash leaves each replaced file whole and no extra file under t3/overrides.
     staging = t3 / "overrides.merge-incoming"
     for outcome in outcomes:
         if outcome.kind == "clean":
@@ -393,6 +391,9 @@ def main():
             plugin = json.loads((source / ".cursor-plugin/plugin.json").read_text())
             sys.path.insert(0, str(ROOT / "scripts"))
             import build
+            import comments
+
+            comments.strip_tree(source)
 
             outcomes = ()
             if not args.dry_run:

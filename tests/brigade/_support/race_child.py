@@ -35,7 +35,6 @@ def _race_child(mode, case, args):
         store.tx = paused_tx
         sys.exit(land["main"](args))
     mod = runpy.run_path(str(SCRIPT))
-    # run_path returns a copy. The live functions read the original globals.
     glob = mod["run"].__globals__
     if mode == "owner":
         original = glob["write_atomic"]

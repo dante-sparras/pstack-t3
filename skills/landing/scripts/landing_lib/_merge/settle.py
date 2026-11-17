@@ -109,7 +109,6 @@ def clean_bounced(store, entry, reason, state=""):
     In local and push mode an entry with no pull request has no landing branch, so only the close runs. Otherwise both steps run when one fails. Each failure prints one warning line. An already closed PR and a branch `remote_branch_is_gone` reports gone are not failures."""
     warnings = []
     results = [close_pr_with_reason(store, entry["pr"], reason, state)]
-    # Local and push modes never push a landing branch for an entry without a pull request.
     if store.contract["mode"] not in ("local", "push") or entry["pr"]:
         results.append(delete_landing_branch(store, seam.human_branch(entry), entry))
     for _done, warning in results:
@@ -183,7 +182,6 @@ def tree_mismatch_pause(store, entry, merged, trunk):
                 cause=f"Git could not read commit {commit} even after asking {remote} for it",
                 fix=f"Check that {remote} serves that commit"))
         trees.append(tree)
-    # The exit codes are those in rewound. Only 0 shows that the merge commit is on trunk.
     code = seam.git("merge-base", "--is-ancestor", merged, trunk, cwd=store.repo, check=False).returncode
     if code == 1:
         raise seam.MergeNotOnTrunk(f"{url} is recorded as merged at {merged[:12]}, and trunk at {trunk[:12]} does not hold "
@@ -270,7 +268,6 @@ def poll(store, entry, out):
         elif checks.blocker == "review":
             pause_for_review(store, entry["pr"], checks.detail, disarm=True, armed=checks.armed)
         return
-    # A merge command can return before pr view reports MERGED.
     reads = 4 if required.request_merge(store, entry["id"], out) else 1
     entry = entry_row(store, entry["id"])
     if entry["state"] != "awaiting-merge":

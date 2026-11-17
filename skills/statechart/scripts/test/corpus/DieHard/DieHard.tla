@@ -1,6 +1,4 @@
 ---- MODULE DieHard ----
-\* The classic jug puzzle from Die Hard 3: a 3-gallon jug, a 5-gallon jug,
-\* and a fountain. Get exactly 4 gallons in the big jug.
 EXTENDS Naturals
 
 VARIABLES big, small
@@ -32,7 +30,5 @@ Next ==
 
 Spec == Init /\ [][Next]_vars
 
-\* The puzzle's goal, written as a rule that should break: TLC's
-\* counterexample is the solution.
 NotSolved == big # 4
 ====

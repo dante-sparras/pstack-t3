@@ -125,8 +125,6 @@ def open_restaurant(root, project_root, name, reporting="milestones", intake=(),
     if admin:
         name = ADMIN_NAME
     directory = root / slug(project_root.name) / (ADMIN_DIR if admin else slug(name))
-    # The project directory is shared by every coordinator on this path slug.
-    # The coordinator directory is the claim, so mkdir must fail when it exists.
     directory.parent.mkdir(parents=True, exist_ok=True)
     with project_lock(directory.parent):
         try:
@@ -205,7 +203,6 @@ def _rename_request(args):
         if value not in (None, ""):
             raise BrigadeError(f"open --rename takes no {flag}")
     new_name = clean(args.rename)
-    # A new name with no letter or digit refuses here, in slug's own sentence.
     slug(args.rename)
     if slug(new_name) == slug(args.name):
         raise BrigadeError(f"open --rename {new_name} keeps the directory {slug(args.name)}; "
@@ -423,7 +420,6 @@ def rename_restaurant(root, args):
     directory = parent / slug(name)
     target = parent / slug(new_name)
     store = Restaurant(directory, owner)
-    # Sibling and landing reads never run under the store lock, so both run before the lock for the rewrite is taken.
     references = _reference_blocks(directory, project_root)
     refused = "open --rename refused, nothing renamed: "
     with store.locked():

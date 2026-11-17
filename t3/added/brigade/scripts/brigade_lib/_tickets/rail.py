@@ -102,7 +102,6 @@ def add_ticket(restaurant, summary, source, ref, request="", rails=None, again=F
     source, ref, request = clean(source), clean(ref), clean(request)
     meta = restaurant.meta
     if request:
-        # A replayed request file must not file a second ticket, whatever state the first reached.
         for row in restaurant.rows("rail.tsv"):
             if row["source"].endswith(f"(request {request})"):
                 raise BrigadeError(f"request {request} is already {row['id']}; nothing added")
@@ -121,8 +120,6 @@ def add_ticket(restaurant, summary, source, ref, request="", rails=None, again=F
     if request:
         source = f"{source} (request {request})"
     with restaurant.guarded():
-        # The kind and goal checks run after the owner fence and after each refusal above, so a ticket add that was
-        # refused before kinds and goals existed is refused with the same words.
         if not kind:
             raise BrigadeError(f"ticket add needs --kind {KIND_CHOICE}")
         if goal is not None:
@@ -159,7 +156,6 @@ def move_ticket(restaurant, ident, to, rails):
         if row["after"]:
             raise BrigadeError(f"{ident} waits on {row['after']}; ticket move does not carry it; "
                                f"run ticket set {ident} --after '' first")
-        # State and destination commit in one rewrite, so the ref stays live here from this point on.
         row["state"], row["dish"] = "moved", destination
         restaurant.save_rows("rail.tsv", rows)
     if not any(event["kind"] == "ticket" and event["id"] == ident and event["state"] == "moved"
@@ -169,7 +165,6 @@ def move_ticket(restaurant, ident, to, rails):
     target_rows = rails.get(target)
     if target_rows is None:
         target_rows = Restaurant(target).rows("rail.tsv")
-    # The kind goes with the ticket. The goal stays, because a goal id names a row of this store's goals.tsv only.
     label = read_labels(restaurant, ActsOn(tickets=(ident,))).tickets[ident]
     if taken_row(target_rows, handoff) is None:
         restaurant.publish(inbox_file(target, handoff), json.dumps({
@@ -198,7 +193,6 @@ def take_tickets(restaurant):
                    "source": f"{handoff['source']} (from {source})", "ref": handoff["ref"], "summary": handoff["summary"],
                    **{key: handoff.get(key, "") for key in ("priority", "paths", "decision")}, "kind": kind}
             if given and not kind:
-                # The warning comes before the write, so a take killed after the write has printed it.
                 restaurant.warn(f"{row['id']} came from {source} with kind {given!r}, which is not one this version knows, "
                                 f"so it has no kind; run ticket set {row['id']} --kind {KIND_CHOICE}")
             restaurant.save_rows("rail.tsv", rows + [row])

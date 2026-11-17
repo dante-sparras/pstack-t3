@@ -77,7 +77,6 @@ class LifecycleMixin:
         result = self.runner("-j", "8", env={**os.environ, "LAND_SLOT": "worker", "LAND_SLOT_FILES": "worker-1"})
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stderr.count(LOWERED), 1, result.stderr)
-        # The lowered line is printed before the run starts, so the plan line follows it.
         self.assertTrue(result.stderr.splitlines()[1].endswith("4 at a time"), result.stderr)
 
     def test_a_run_inside_a_two_slot_command_keeps_8_jobs(self):

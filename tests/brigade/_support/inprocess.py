@@ -263,7 +263,6 @@ def _call_in_process(test, script, argv, *, stdin, env, cwd):
     saved = _save_process()
     arguments = [str(arg) for arg in argv]
     try:
-        # The interpreter line-buffers stderr and block-buffers a pipe's stdout.
         out_raw, out = _capture_stream(False)
         err_raw, err = _capture_stream(True)
         sys.stdout = out

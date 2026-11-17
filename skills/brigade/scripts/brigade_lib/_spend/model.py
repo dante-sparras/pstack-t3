@@ -200,7 +200,6 @@ class _Store:
 
 class _Bare(Exception):
     def __init__(self):
-        # The failing log line must not leave this function inside the exception.
         Exception.__init__(self)
 
 

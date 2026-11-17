@@ -36,7 +36,6 @@ class CaseBase:
 
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
-        # Cleanups run after tearDown, last registered first, so this one runs after every holder a test leaves running is stopped.
         self.addCleanup(self.temporary.cleanup)
         self.base = Path(self.temporary.name)
         self.env = mock.patch.dict(os.environ, {"XDG_STATE_HOME": str(self.base / "state")})

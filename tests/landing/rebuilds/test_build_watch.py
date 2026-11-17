@@ -36,9 +36,6 @@ class LandingTest(RebuildsBase, LandingTestBase):
     def test_build_watch_supports_descriptors_above_1024(self):
         """The build watch reads pipes above descriptor 1024."""
         import resource
-        # Holding one descriptor per pass leaves the next pipe at 1025 and 1026
-        # with nothing open above 1024, so the runner's wake pipe, selector, and
-        # subprocess pipes run to 1031.
         needed = 1032
         soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
         if hard < needed:
@@ -58,7 +55,6 @@ class LandingTest(RebuildsBase, LandingTestBase):
             os.close(first)
             os.close(second)
             held.append(os.open(os.devnull, os.O_RDONLY))
-        # The command exits 3 so the test can read the status back.
         code, out = land.run_build("exit 3", str(self.work), 10)
         self.assertEqual((code, out), (3, ""))
 

@@ -85,7 +85,6 @@ def drop_backup(backup, aside, published, fd):
     """
     path = published.path
     try:
-        # The rename takes whatever the path names now into a directory only this call uses, so the check and the delete see one entry.
         os.rename(backup, aside)
     except FileNotFoundError:
         return
@@ -163,17 +162,14 @@ def restore_aside(backup, aside, path, fd):
     It checks `same_entry` before the move to authorize it, then `place_proven` proves the live entry right after the move. Proof success finishes the restore. Proof failure leaves the live entry where it is and keeps the backup row. The refusal cleanup can remove a held twin at the private name.
     """
     try:
-        # A second name keeps the backup name until place_proven reports successful placement.
         os.link(backup, aside, follow_symlinks=False)
         taken = moves.TWIN
     except (OSError, NotImplementedError):
-        # A directory cannot be hard linked. The no-replace rename that moves it here is the one that can put it back.
         code = moves.rename_noreplace(backup, aside)
         if code != 0:
             return CHANGED if code == errno.ENOENT else moves.refusal(path, code)
         taken = moves.MOVED
     if not moves.same_entry(aside, fd):
-        # For a moved entry it returns the entry to `backup`. For a twin it drops the second name, or parks what took its place.
         return give_back(taken, backup, aside, CHANGED)
     placed = place_proven(aside, path, fd)
     if isinstance(placed, moves.Published):
@@ -193,12 +189,8 @@ def restore_backup(backup, path, held):
         now = layout.identity(os.lstat(backup))
     except OSError:
         now = None
-    # ext4 hands a freed inode number, and with small inodes its whole-second change time, to the next new entry, so equal numbers alone prove nothing.
-    # The held descriptor keeps the planned inode in use, so an entry made since has other numbers. The change time also catches one changed in place.
     if now is None or now[:2] != layout.identity(os.fstat(held.fd))[:2] or now != held.entry:
         return CHANGED
-    # The backup path can name another entry from here on, so every later step acts on the held entry, on a name this call makes in a holder directory, or on one first moved where only this call looks.
-    # Another installer can take `path` after the plan saw it empty. Each step refuses it instead of replacing it.
     code = moves.link_held(held.fd, path)
     if code == errno.EEXIST:
         return moves.refusal(path, code)
@@ -216,7 +208,6 @@ def restore_backup(backup, path, held):
     try:
         holder = moves.Holder(backup)
     except FileNotFoundError:
-        # The backup left with its directory, so no name is left to clean up or to restore from.
         return CHANGED
     with holder:
         return restore_aside(backup, holder.aside, path, held.fd)

@@ -33,8 +33,6 @@ GIT_ENV = {
     "GIT_COMMITTER_NAME": "Fixture",
     "GIT_COMMITTER_EMAIL": "fixture@example.invalid",
     "LC_ALL": "C",
-    # git commit starts a detached "git maintenance run --auto" that holds .git/objects/maintenance.lock
-    # while it runs, and a snapshot of a checkout can catch it.
     "GIT_CONFIG_COUNT": "1",
     "GIT_CONFIG_KEY_0": "maintenance.auto",
     "GIT_CONFIG_VALUE_0": "false",
@@ -189,7 +187,7 @@ def new_upstream(directory):
 def new_checkout(directory, repository, pinned):
     root = Path(directory) / "checkout"
     shutil.copytree(ROOT / "scripts/_check", root / "scripts/_check", ignore=shutil.ignore_patterns("__pycache__"))
-    for name in ("sync_upstream", "build", "check"):
+    for name in ("sync_upstream", "build", "check", "comments"):
         shutil.copy(ROOT / f"scripts/{name}.py", root / "scripts")
     write_tree(root, T3_TREE)
     write_tree(root / "vendor", {name: text for name, text in PINNED_TREE.items() if name.startswith("pstack/")})
@@ -262,7 +260,6 @@ class CheckoutCase(unittest.TestCase):
         self.scratch.mkdir()
 
     def sync(self, *flags, **environment):
-        # PYTHONDONTWRITEBYTECODE in a developer's shell would hide a script that writes __pycache__.
         inherited = {name: value for name, value in GIT_ENV.items() if not name.startswith("PYTHON")}
         program = self.root / "scripts/sync_upstream.py"
         with checkout_import(program):

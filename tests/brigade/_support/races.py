@@ -43,7 +43,6 @@ class _TicketsRace:
             text=True)
         try:
             _wait_for_path(case / "checking")
-            # race between two processes
             added = real_process(
                 ProcessReason.RACE, SCRIPT,
                 ["--store", str(self.store), "--at", str(self.at),
@@ -85,7 +84,6 @@ class _ItemsRace:
             text=True)
         try:
             _wait_for_path(case / "claiming")
-            # race between two processes
             other = real_process(
                 ProcessReason.RACE, SCRIPT,
                 ["--store", str(self.store), "--at", str(self.at),
@@ -130,7 +128,6 @@ class _ReportingRace:
             text=True)
         try:
             _wait_for_path(case / "claiming")
-            # race between two processes
             other = real_process(
                 ProcessReason.RACE, SCRIPT,
                 ["--store", str(self.store), "--at", str(self.at),

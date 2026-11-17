@@ -91,7 +91,6 @@ class BrigadeFenceOrderTest(unittest.TestCase):
             os.environ.update(sentinels)
             before = dict(os.environ)
             seen = []
-            # This module already registered its fence cleanup. A nested run would pop that cleanup with its own.
             unittest.case._module_cleanups.clear()
             try:
                 suite = unittest.TestSuite(watch(load_case(name), sentinels, seen) for name in ORDER)

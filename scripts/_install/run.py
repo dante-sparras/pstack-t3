@@ -55,7 +55,6 @@ def execute(plan, state, root):
                     stamp = moves.made_directory(backups, f"{time.strftime('%Y%m%dT%H%M%S')}-{os.getpid()}-")
                 backup = os.path.join(stamp, step.place)
                 step = replace(step, backup=backup, add_backups=({"harnesses": list(step.harnesses), "original": step.path, "backup": backup},))
-            # A backup row that holds this checkout's entry needs the claim to stay owned after it is restored.
             if step.kind == "forget" and (step.path in failed or records.buried(state, root, step.path)):
                 counts["kept_extra"] += len(step.remove_claims)
                 continue
@@ -71,7 +70,6 @@ def execute(plan, state, root):
                 if step.kind == "move":
                     harness = os.path.basename(os.path.dirname(step.backup))
                     if harness not in made:
-                        # mkdir refuses a <harness> that is already there, so this run never uses one it did not make.
                         os.mkdir(os.path.dirname(step.backup))
                         made.append(harness)
                 declined = act(step, root)
@@ -79,7 +77,6 @@ def execute(plan, state, root):
                 print(f"skipped {plans.subject(step)}: {error}")
                 counts["skipped"] += 1
                 failed.add(step.path)
-                # A move can fail after copying part of the entry, and then the row is the only record of that copy.
                 if not (step.kind == "move" and os.path.lexists(step.backup)):
                     undo()
                 continue

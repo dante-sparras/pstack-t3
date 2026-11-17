@@ -138,7 +138,6 @@ def init(path, trunk, mode, remote, base, checks, setup, batch, timeout, merge_m
     allowed = None
     if merge_method is not None or mode == "merge" or stored_method is not None:
         allowed = allowed_merge_methods(repo)
-    # A refused method must fail before the store exists, so a first init leaves no database.
     merge_method_to_store(merge_method, stored_method, mode, allowed)
     fixed = {"commonDir": str(common), "trunk": trunk, "mode": mode, "remote": remote}
 
@@ -161,15 +160,12 @@ def init(path, trunk, mode, remote, base, checks, setup, batch, timeout, merge_m
             if listed.returncode == 0 and not listed.stdout.strip():
                 raise seam.LandError(f"{remote} has no {trunk} branch; push a first commit to {remote} {trunk} and run land.py init again")
         seam.git("fetch", remote, trunk, cwd=repo)
-    # A bad generated path must be refused before the store exists, so a first init leaves no database.
     if generated is not None:
         generated_list(generated, [])
     if generated_map is not None:
         early_roots = generated_list(generated, stored.get("generated") or [])
         seam.parse_map(generated_map, early_roots)
-    # A refused size flag must fail the same way.
     baseline_to_store = size_baseline_value(size_baseline, stored.get("sizeBaseline"))
-    # A local lane without a base is refused, and a base is resolved, before the store is written.
     lane = trunk_ref({"mode": mode, "trunk": trunk, "remote": remote})
     lane_sha = None
     if mode == "local" and seam.git("rev-parse", "--verify", "--quiet", lane, cwd=repo, check=False).returncode != 0:
@@ -200,12 +196,10 @@ def init(path, trunk, mode, remote, base, checks, setup, batch, timeout, merge_m
                     db.execute("INSERT OR REPLACE INTO contract VALUES (?, ?)", (key, json.dumps(value)))
             if cap is not None:
                 set_cap(db, cap)
-            # Size keys stay absent until a flag sets them, so an older contract keeps no size key.
             if size_max_tokens is not None:
                 db.execute("INSERT OR REPLACE INTO contract VALUES ('sizeMaxTokens', ?)", (json.dumps(size_max_tokens),))
             if baseline_to_store is not None:
                 db.execute("INSERT OR REPLACE INTO contract VALUES ('sizeBaseline', ?)", (json.dumps(baseline_to_store),))
-            # The lane ref moves before COMMIT, so a refused ref rolls the contract back with it.
             if lane_sha:
                 created = seam.git("update-ref", lane, lane_sha, "", cwd=repo, check=False)
                 if created.returncode != 0:
@@ -252,7 +246,6 @@ def change_mode(store, mode, merge_method):
         if merge_method:
             pick_merge_method(merge_method, allowed)
     with store.tx() as db:
-        # The read above can go stale while gh runs. This one decides the write.
         current = json.loads(db.execute("SELECT value FROM contract WHERE key = 'mode'").fetchone()["value"])
         current = seam.LEGACY_MODES.get(current, current)
         if "local" in (mode, current) and mode != current:
@@ -263,7 +256,6 @@ def change_mode(store, mode, merge_method):
         db.execute("INSERT OR REPLACE INTO contract VALUES ('mode', ?)", (json.dumps(mode),))
         method = merge_method
         if not method and mode == "merge" and allowed is not None:
-            # Check the method stored now, not the one stored before gh ran.
             method = None if (store.contract.get("mergeMethod") or "merge") in allowed else pick_merge_method(None, allowed)
         if method:
             db.execute("INSERT OR REPLACE INTO contract VALUES ('mergeMethod', ?)", (json.dumps(method),))

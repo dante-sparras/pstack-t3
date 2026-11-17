@@ -108,7 +108,6 @@ class LandingTest(RebuildsBase, LandingTestBase):
                                     entry = raising_previous if kind == "raising" else returning_previous
                                     signal.signal(signal.SIGINT, entry)
                                     fired = [0]
-                                    # hit records reach when raise interrupts before the increment.
                                     hit = [False]
 
                                     def tracer(frame, event, arg):

@@ -63,7 +63,6 @@ class BrowserCase(unittest.TestCase):
             self.skipTest(reason)
 class RenderHeightTest(BrowserCase):
     def test_height_of_each_page_drawn_at_390_pixels_is_not_above_the_height_the_model_reserves_or_the_frame(self):
-        # The four pages the reviewer of pull request 192 measured, each with the reserved height, the timeline rows, and the flight groups the fit leaves on it.
         cases = (
             ("busy ordinary", busy_page(self.root / "ordinary", [f"Ship {number}" for number in range(1, 37)]), 1936, 11, 8),
             ("busy wide", busy_page(self.root / "wide", ["W" * 36] * 36), 1960, 9, 8),
@@ -163,7 +162,6 @@ class LiveAttemptFoldTest(BrowserCase):
         drawn = confined_run(self.browser, target, self.root, "s", RENDER_TIMEOUT)
         seen = json.loads(html.unescape(TITLE.search(drawn).group(1)))
         self.assertEqual(seen["ids"], ["work item", "work item"])
-        # Deleting `if (block) block.open = attemptOpen;` from LIVE_FOLD's apply() leaves [true, false].
         self.assertEqual(seen["open"], [True, True])
     def test_two_groups_that_print_one_work_item_id_fold_independently(self):
         fixture = Fixture(str(self.root / "fold-alone"))
@@ -188,7 +186,6 @@ class LiveAttemptFoldTest(BrowserCase):
         fixture.write_database()
         result = in_process.invoke(fixture.command())
         self.assertEqual((result.returncode, result.stderr), (0, ""))
-        # The second fold re-applies state after the click on the same nodes.
         probe = "".join((
             "<script>", MOD["LIVE_FOLD"], "</script>",
             "<script>",
@@ -218,7 +215,6 @@ class LiveAttemptFoldTest(BrowserCase):
         seen = json.loads(html.unescape(TITLE.search(drawn).group(1)))
         self.assertEqual(seen["ones"], ["work item", "work item"])
         self.assertTrue(len(seen["first"]) > 0 and all(each == "none" for each in seen["first"]))
-        # Keying the fold by id alone leaves every row of the second group at none.
         self.assertTrue(len(seen["second"]) > 0 and any(each != "none" for each in seen["second"]))
         self.assertEqual(seen["open"], [True, True])
 class ProbeSkipTest(unittest.TestCase):

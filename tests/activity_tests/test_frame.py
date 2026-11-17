@@ -90,7 +90,6 @@ class FrameTest(OutputCase):
             group(item("C"), row("c1"), row("c2"), row("c3")),
             group(item("D"), row("d1"), row("d2"), row("d3")))
         self.assertEqual(MOD["height"](built), 713)
-        # Deleting `left -= GROUP_PX * len(headed)` makes the cut 715 against 712.
         self.assertLessEqual(MOD["height"](MOD["framed"](built, 712)), 712)
 
     def test_the_frame_keeps_room_for_each_strip_group(self):
@@ -125,7 +124,6 @@ class FrameTest(OutputCase):
         self.assertEqual(len(cut.groups), 0)
         self.assertLessEqual(MOD["height"](cut), 1960)
         self.assertEqual(cut.hidden.cut_lines, 96 - MOD["line_count"](cut))
-        # Each work item keeps its newest lines, so no work item loses its ledger to make room.
         for one in MOD["items_of"](cut):
             self.assertEqual([line.seat for line in one.lines], seats[one.id][-len(one.lines):])
             self.assertGreater(len(one.lines), 0)
@@ -133,7 +131,6 @@ class FrameTest(OutputCase):
         self.assertLessEqual(MOD["height"](fitted), 1960)
         self.assertLess(len(document.encode()), 16000)
         self.assertGreater(fitted.hidden.cut_lines, 0)
-        # Each work item on the fitted page keeps its newest current lines.
         for one in MOD["items_of"](fitted):
             self.assertEqual([line.seat for line in one.lines],
                              seats[one.id][-len(one.lines):])
@@ -170,10 +167,8 @@ class FrameTest(OutputCase):
             fixture.thread(worker(number + 1), title=f"D{number} worker", turns=(("completed", 10, 9),))
         page = page_of(fixture)
         fitted, document = MOD["fit"](page, 15999, CLEAN, 1960)
-        # The last fold before the cap renders 16073 bytes, over the 15999-byte budget and over the 1960-pixel frame, so its frame cuts run before the cap.
         self.assertEqual((len(fitted.groups), MOD["height"](fitted), len(document.encode())), (19, 1888, 15813))
         shifted, shifted_document = MOD["fit"](page, 16117, CLEAN, 1960)
-        # The reclaimed cut of twenty groups renders at 16118 bytes, one over the 16117-byte budget, so fit keeps the cut before reclaim.
         self.assertEqual((len(shifted.groups), MOD["height"](shifted), len(shifted_document.encode())), (19, 1888, 15813))
 
     def test_fit_tries_the_fold_pages_frame_cuts_when_the_trimmed_pages_frame_cuts_stay_over_budget(self):
@@ -190,6 +185,5 @@ class FrameTest(OutputCase):
         page = page_of(fixture)
         trimmed, _, fits = MOD["within_budget"](page, 15999, CLEAN, MOD["render_html"], ledger=MOD["newest_ledger"])
         self.assertEqual((fits, MOD["height"](page), MOD["height"](trimmed)), (False, 2062, 1374))
-        # The trimmed page renders 16653 bytes, over the 15999-byte budget, but its height fits the 1960-pixel frame, so its frame cuts keep all ten groups and stay over budget. The fold page's frame cut keeps eight groups.
         fitted, document = MOD["fit"](page, 15999, CLEAN, 1960)
         self.assertEqual((len(fitted.groups), MOD["height"](fitted), len(document.encode())), (8, 1216, 15065))

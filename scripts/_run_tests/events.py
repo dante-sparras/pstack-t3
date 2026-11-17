@@ -9,29 +9,26 @@ from pathlib import Path
 
 from . import NO_TESTS, QUOTED_BYTES, QUOTED_LINES
 
-# The fields each event holds besides "ev".
 EVENTS = {
-    "start": {"seq": int},                                    # the test began
-    "result": {"seq": int, "status": str, "problems": list},  # the test ended
-    "behind": {"seq": int, "skip": bool},                     # the test did not start, behind a setUpClass or setUpModule that skipped or failed
-    "skipped": {"method": str, "name": str},                  # the setUpClass of the class with that name or the setUpModule of the module with that name raised SkipTest
-    "fixture": {"label": str, "traceback": str},              # an error or a failure outside a running test
-    "done": {},                                               # the worker's suite returned
+    "start": {"seq": int},
+    "result": {"seq": int, "status": str, "problems": list},
+    "behind": {"seq": int, "skip": bool},
+    "skipped": {"method": str, "name": str},
+    "fixture": {"label": str, "traceback": str},
+    "done": {},
 }
 STATUSES = ("ok", "skip", "xfail", "xpass", "bad")
 PROBLEM = {"kind": str, "label": str, "traceback": str}
-# The name unittest reports a setUpClass or setUpModule under when it failed or raised SkipTest.
 SETUP = re.compile(r"(setUpClass|setUpModule) \((.+)\)")
 
 
 @dataclass(frozen=True)
 class Outcome:
-    word: str    # heads the notice and the block. "" for a kind that prints neither.
+    word: str
     fails: bool
-    tally: str   # its name in the last line. "" is not listed.
+    tally: str
 
 
-# The order is the order of the last line.
 OUTCOMES = {
     "fail": Outcome("FAIL", True, "failures"),
     "error": Outcome("ERROR", True, "errors"),
@@ -45,24 +42,24 @@ OUTCOMES = {
 
 @dataclass(frozen=True)
 class Problem:
-    kind: str        # "fail" or "error"
-    label: str       # the text after the word in the block heading
+    kind: str
+    label: str
     traceback: str
 
 
 @dataclass(frozen=True)
 class Verdict:
-    kind: str        # "ok", "skip", "xfail", "xpass", "lost", or "bad"
-    problems: tuple[Problem, ...] = ()   # non-empty exactly when kind is "bad"
-    cause: str = ""  # why a "lost" test has no result
+    kind: str
+    problems: tuple[Problem, ...] = ()
+    cause: str = ""
 
 
 @dataclass(frozen=True)
 class Test:
-    seq: int         # index in discovery order, the key for every result
+    seq: int
     id: str
     module: str
-    cls: str         # its class, as class_name returns it
+    cls: str
 
 
 @dataclass(frozen=True)
@@ -70,21 +67,21 @@ class Shard:
     number: int
     module: str
     seqs: tuple[int, ...]
-    classes: tuple[str, ...]   # the cls of the test at each seq, in the order of seqs
+    classes: tuple[str, ...]
 
 
 @dataclass(frozen=True)
 class Ended:
     status: int
-    over: float | None = None   # the limit, when the runner killed the worker for exceeding it
+    over: float | None = None
 
 
 @dataclass(frozen=True)
 class Accounting:
     verdicts: dict[int, Verdict]
     fixtures: tuple[Problem, ...]
-    violations: tuple[tuple[int | None, str], ...]   # what the worker did that the shard may not, and the seq of the event when it holds one
-    ending: str   # how the worker ended when a clean finish excludes that ending, else ""
+    violations: tuple[tuple[int | None, str], ...]
+    ending: str
 
 
 class Refusal(Exception):
@@ -180,9 +177,9 @@ class Channel:
         self.offset = 0
         self.lines = 0
         self.events: list[dict] = []
-        self.errors: list[str] = []   # the report's text for what the file holds that is not an event, and for why the runner stopped reading it
-        self.unquoted = 0             # lines that are not events, past the QUOTED_LINES that errors quotes
-        self.stopped = False          # whether read found a change that `changed` names
+        self.errors: list[str] = []
+        self.unquoted = 0
+        self.stopped = False
 
     def changed(self, held: os.stat_result) -> str:
         """Return what happened to the file, or "" when the path leads to the open file and the file is no shorter than what was read."""

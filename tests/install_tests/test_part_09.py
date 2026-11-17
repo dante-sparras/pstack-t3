@@ -80,7 +80,6 @@ class Part09Test(OwnershipCase):
             os.mkfifo(backup / "pipe")
             os.chmod(backup / "pipe", 0o620)
             os.link(backup / "SKILL.md", backup / "hard")
-            # Linux offers user xattrs. macOS offers xattrs through libc. Where neither works omit xattr asserts but keep other checks.
             can_xattr = extended_attribute(backup / "SKILL.md", "user.review", b"metadata")
             raced = run(self.home, a, "--harness", "grok", "uninstall")
             self.ok(raced, "removed 3 links, restored 1 entries")

@@ -41,9 +41,6 @@ GOOD = """
             pass
 """
 
-# A temporary project's tests import this to tell the test that owns the project which processes they started.
-# A report is a pid and the start time field 22 of /proc/<pid>/stat reports for it, or - where /proc has no entry for the pid.
-# mine, sleeper, and orphan take a report from the process it names before that process can exit, and every step after that carries it unchanged.
 MARKS = """
     import os
     import subprocess
@@ -144,7 +141,6 @@ HANG_AT_IMPORT = """
             pass
 """
 
-# Each line is written before a passing test ends, so the test's own result follows it.
 WRITES_TO_ITS_RESULT_FILE = """
     import json
     import sys
@@ -174,7 +170,6 @@ NEVER_AN_EVENT = """
                     time.sleep(0.05)
 """
 
-# {body} is DURING_THE_TEST or AT_EXIT with remove, replace, or shorten for {act}.
 RESULT_FILE = """
     import atexit
     import os
@@ -210,8 +205,6 @@ RESULT_FILE = """
 DURING_THE_TEST = "{act}(); time.sleep(60)"
 AT_EXIT = "atexit.register({act})"
 
-# Argument 1 is the project directory. The launcher starts a child that starts a sleeper in a new session, then
-# becomes the command in its other arguments. The child ends when allow-parent-exit appears in the project.
 LAUNCHER_CHILD = (
     "import os, subprocess, sys, time\n"
     "from pathlib import Path\n"
@@ -241,7 +234,6 @@ LAUNCHER = (
     "os.execv(sys.executable, [sys.executable, *sys.argv[2:]])\n"
 )
 
-# Lets the launcher's child end, waits until it has ended, and then sleeps {seconds}.
 RELEASES_THE_PARENT = """
     import time
     import unittest
@@ -321,7 +313,6 @@ class RunnerCase:
         self.proj = Path(tmp.name).resolve() / "proj"
         self.tests = self.proj / "tests"
         self.tests.mkdir(parents=True)
-        # The runner makes its scratch directory here.
         self.scratch = Path(tmp.name).resolve() / "scratch"
         self.scratch.mkdir()
 
@@ -340,7 +331,6 @@ class RunnerCase:
         try:
             out, err = proc.communicate(timeout=limit)
         except subprocess.TimeoutExpired:
-            # proc is this test's unreaped child, so the kernel keeps its pid and process group id until communicate reaps it.
             os.killpg(proc.pid, signal.SIGKILL)
             proc.communicate()
             self.fail(f"the runner was still running after {limit} s")

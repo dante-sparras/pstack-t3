@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 try:
     import yaml
-except ImportError:  # the build still runs; frontmatter gets the shallow check only
+except ImportError:
     yaml = None
 
 from _check.changes import _at_file_line, change_findings

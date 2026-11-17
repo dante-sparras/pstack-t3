@@ -55,7 +55,6 @@ class ApplyTest(BrigadeTest):
         return self.run_raw("edits", "apply", *args)
 
     def test_clean_apply_writes_only_the_edit_and_build_output_fails_when_apply_does_not_exist(self):
-        # Processes: git builds the fixture project; edits apply runs the build script.
         self.contract()
         reviewed = self.edits_store()
         self.review_file("D1-review-1.md", report(block("1", "src/greeting.txt", "helo", "hello"),
@@ -90,7 +89,6 @@ class ApplyTest(BrigadeTest):
         self.assertIn(reviewed, message)
 
     def test_apply_refuses_a_doubled_old_text_fails_when_the_count_is_not_checked(self):
-        # Processes: git builds the fixture project; edits apply refuses before creating anything.
         self.contract()
         reviewed = self.edits_store()
         self.commit_files({"src/greeting.txt": "second and second\n"})
@@ -108,7 +106,6 @@ class ApplyTest(BrigadeTest):
         self.assertFalse(target.exists())
 
     def test_apply_cleans_up_after_a_failing_build_fails_when_build_failures_leave_a_worktree(self):
-        # Processes: git builds the fixture project; edits apply runs a failing build script.
         failing = ('import sys\nprint("build broke")\nsys.exit(2)\n')
         self.contract()
         reviewed = self.edits_store(**{"tools/build.py": failing})
@@ -125,7 +122,6 @@ class ApplyTest(BrigadeTest):
         self.assertFalse(target.exists())
 
     def test_apply_refuses_a_generated_path_fails_when_generated_output_is_edited(self):
-        # Processes: git and land build the fixture project and its contract; edits apply reads the contract.
         self.git_project()
         self.init_landing("--generated", "out")
         self.landing_env()
@@ -143,7 +139,6 @@ class ApplyTest(BrigadeTest):
         self.assertFalse(target.exists())
 
     def test_apply_skips_a_missing_build_fails_when_a_missing_build_is_not_skipped(self):
-        # Processes: git and land build the fixture project and its contract; edits apply commits without running a build.
         self.init_landing()
         self.landing_env()
         reviewed = self.commit_files({"src/greeting.txt": self.SOURCE, "out/greeting.txt": self.SOURCE.upper(),
@@ -171,7 +166,6 @@ class ApplyTest(BrigadeTest):
             subprocess.run(["git", "-C", str(self.project), "worktree", "prune"], capture_output=True)
 
     def test_apply_leaves_setup_output_uncommitted_fails_when_setup_output_is_committed(self):
-        # Processes: git and land build the fixture project and its contract; edits apply runs its setup script.
         setup = f"{shlex.quote(sys.executable)} tools/setup.py"
         self.git_project()
         self.init_landing("--setup", setup)
@@ -207,7 +201,6 @@ class ApplyTest(BrigadeTest):
         self.review_file("D1-review-1.md", report(block("1", "src/greeting.txt", "helo", "hello")))
 
     def test_apply_refuses_when_the_contract_read_fails_fails_when_a_failed_read_means_no_generated_paths(self):
-        # Processes: git builds the fixture project; edits apply reads the contract in this process with land.py faked.
         self.init_landing("--generated", "out")
         self.landing_env()
         reviewed = self.edits_store()
@@ -230,7 +223,6 @@ class ApplyTest(BrigadeTest):
                 self.assertFalse(target.exists())
 
     def test_apply_refuses_an_existing_worktree_path_fails_when_a_user_directory_is_removed(self):
-        # Processes: git builds the fixture project; edits apply refuses before it creates anything.
         self.contract()
         reviewed = self.edits_store(**{"tools/build.py": "import sys\nsys.exit(2)\n"})
         self.one_edit()
@@ -253,7 +245,6 @@ class ApplyTest(BrigadeTest):
         self.assertTrue(away.is_dir())
 
     def test_apply_refuses_a_worktree_path_inside_the_repository_fails_when_it_writes_into_the_checkout(self):
-        # Processes: git builds the fixture project and a second worktree; edits apply refuses before it creates anything.
         self.contract()
         reviewed = self.edits_store()
         self.one_edit()
@@ -271,7 +262,6 @@ class ApplyTest(BrigadeTest):
                 self.assertEqual(self.status(), status)
 
     def test_apply_commits_only_edited_and_built_paths_fails_when_setup_stages_a_file(self):
-        # Processes: git and land build the fixture project and its contract; edits apply runs a setup that stages a file.
         setup = f"{shlex.quote(sys.executable)} tools/setup.py"
         self.init_landing("--setup", setup)
         self.landing_env()
@@ -287,7 +277,6 @@ class ApplyTest(BrigadeTest):
         self.assertEqual(sorted(names), ["out/greeting.txt", "src/greeting.txt"])
 
     def test_apply_cleans_up_a_locked_worktree_fails_when_setup_locks_it_and_the_build_fails(self):
-        # Processes: git and land build the fixture project and its contract; edits apply runs a setup that locks the worktree.
         self.init_landing("--setup", "git worktree lock .")
         self.landing_env()
         reviewed = self.edits_store(**{"tools/build.py": "import sys\nsys.exit(2)\n"})
@@ -305,7 +294,6 @@ class ApplyTest(BrigadeTest):
         self.assertIn("prunable", self.worktrees())
 
     def test_apply_fails_on_a_rejecting_hook_fails_when_the_commit_skips_hooks(self):
-        # Processes: git builds the fixture project; edits apply commits through a pre-commit hook that exits 44.
         self.contract()
         reviewed = self.edits_store()
         self.one_edit()
@@ -321,7 +309,6 @@ class ApplyTest(BrigadeTest):
         self.assertFalse(target.exists())
 
     def test_apply_cleans_up_a_failed_add_fails_when_the_worktree_stays_registered(self):
-        # Processes: git builds the fixture project; edits apply runs a post-checkout hook that rejects the new worktree.
         self.contract()
         reviewed = self.edits_store()
         self.one_edit()
@@ -341,7 +328,6 @@ class ApplyTest(BrigadeTest):
                 self.assertFalse(target.exists())
 
     def test_apply_commits_only_edited_and_built_paths_fails_when_a_commit_hook_stages_a_file(self):
-        # Processes: git and land build the fixture project and its contract; edits apply commits through a pre-commit hook that stages setup output.
         setup = f"{shlex.quote(sys.executable)} tools/setup.py"
         self.init_landing("--setup", setup)
         self.landing_env()

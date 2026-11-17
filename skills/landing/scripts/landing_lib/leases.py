@@ -111,7 +111,6 @@ def lease_widen(store, number, paths, ttl_hours=6, owner=None):
 def lease_reserve(store, prefix, paths, ruling, ttl_hours, owner):
     holder_prefix(prefix)
     wanted = wanted_paths(paths)
-    # take() never drops an empty path for a narrower lease, so reserving one blocks every other holder until expiry.
     if "" in wanted:
         raise seam.LandError("a reservation names the contested paths; it cannot hold the whole repository")
     with store.tx() as db:

@@ -209,7 +209,6 @@ class Part13Test(OwnershipCase):
             unrelated = self.home / "unrelated_stamp" / "grok"
             unrelated.mkdir(parents=True)
             write_legacy(self.home, [], [{"harnesses": ["grok"], "original": str(swarm), "backup": str(saved)}])
-            # With a directory mounted at <stamp> below the state path as given, that name opens as the mounted directory under a backups descriptor opened through that path.
             code = (
                 "os.environ['HOME'] = '.'\n"
                 "opening, closing = os.open, os.close\n"

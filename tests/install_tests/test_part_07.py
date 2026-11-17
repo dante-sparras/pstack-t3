@@ -99,7 +99,6 @@ class Part07Test(OwnershipCase):
                     if kind == "file":
                         os.chmod(backup, 0o604)
                         os.utime(backup, ns=times)
-                        # A filesystem with whole-second timestamps keeps only the seconds.
                         stored = backup.stat().st_mtime_ns
                     elif kind == "directory":
                         os.symlink("SKILL.md", backup / "alias")
@@ -154,7 +153,6 @@ class Part07Test(OwnershipCase):
                     self.use_fresh()
                     a, swarm, rows = self.displaced_by("directory")
                     backup = Path(rows[0]["backup"])
-                    # With no safe rename the directory never leaves its place, so no move is tried.
                     raced = self.cross_device_uninstall(swarm, a, rename=rename, crossed=False)
                     self.assertEqual(crossings(self.home), 0)
                     code = self.noreplace(rename)
