@@ -78,6 +78,22 @@ class CheckBriefCliTest(unittest.TestCase):
         completed = check_text(brief)
         self.assert_check(completed, 1, MISSING_PERSONA)
 
+    def test_worker_line_above_the_persona_passes(self):
+        brief = (
+            "Read C:/Users/Some One/skills/poteto-mode/worker.md before anything else.\n"
+            f"{agent_body()}\n\nPlaybook: playbooks/refactoring.md\nMode: full\n"
+        )
+        completed = check_text(brief)
+        self.assert_check(completed, 0, "ok playbooks/refactoring.md\n")
+
+    def test_other_text_between_the_worker_line_and_the_persona_fails(self):
+        brief = (
+            "Read /skills/poteto-mode/worker.md before anything else.\nRead this note first.\n\n"
+            f"{agent_body()}\n\nPlaybook: playbooks/refactoring.md\nMode: full\n"
+        )
+        completed = check_text(brief)
+        self.assert_check(completed, 1, MISSING_PERSONA)
+
     def test_persona_after_other_text(self):
         brief = f"Read this note first.\n\n{agent_body()}\n\nPlaybook: playbooks/refactoring.md\nMode: full\n"
         completed = check_text(brief)

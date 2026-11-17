@@ -49,11 +49,6 @@ CASES = (
         for p in sorted((ROOT / "t3/scripts/_roles").glob("*.py"))
     ),
     (
-        "t3/overrides/poteto-mode/scripts/check-plan.mjs",
-        "poteto-mode/scripts/check-plan.mjs",
-        None,
-    ),
-    (
         "t3/overrides/poteto-mode/scripts/worktree-audit.sh",
         "poteto-mode/scripts/worktree-audit.sh",
         None,
@@ -114,8 +109,8 @@ class BuildModeTest(unittest.TestCase):
     def test_a_read_only_copy_builds_the_same_files_and_modes_as_a_writable_one(self):
         if hasattr(os, "geteuid") and os.geteuid() == 0:
             self.skipTest("read-only modes do not stop root writes")
-        # The override layer copies architect/SKILL.md over the file the vendor layer wrote.
-        for rel in ("vendor/pstack/skills/architect/SKILL.md", "t3/overrides/architect/SKILL.md"):
+        # The override layer copies arena/SKILL.md over the file the vendor layer wrote.
+        for rel in ("vendor/pstack/skills/arena/SKILL.md", "t3/overrides/arena/SKILL.md"):
             self.assertTrue((ROOT / rel).is_file(), rel)
 
         def set_owner_write(root, writable):

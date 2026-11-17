@@ -87,7 +87,7 @@ class BackupCliTest(BackupCliCase):
 
     def test_cursor_light_role_relaunches_on_claude_agent_sonnet(self):
         completed = self.backup(
-            "--role", "how explorer",
+            "--role", "skill tests",
             "--provider", "cursor",
             "--model", "claude-haiku-5-5",
             "--options", '{"effort": "medium"}',
@@ -95,10 +95,10 @@ class BackupCliTest(BackupCliCase):
         )
         self.assert_backup(completed, {
             "decision": "relaunch",
-            "role": "how explorer",
+            "role": "skill tests",
             "failed": "cursor/claude-haiku-5-5",
             "seat": {"providerInstanceId": "claudeAgent", "model": "claude-sonnet-5-5", "options": {"effort": "medium"}},
-            "report": "how explorer: cursor/claude-haiku-5-5 hit its usage limit; relaunched on claudeAgent/claude-sonnet-5-5 at medium",
+            "report": "skill tests: cursor/claude-haiku-5-5 hit its usage limit; relaunched on claudeAgent/claude-sonnet-5-5 at medium",
         })
 
 
@@ -290,7 +290,7 @@ class BackupCliTest(BackupCliCase):
 
     def test_resume_of_a_light_role_uses_sonnet_when_the_provider_stays_out(self):
         completed = self.backup(
-            "--role", "how explorer",
+            "--role", "skill tests",
             "--provider", "grok",
             "--model", "grok-4.7",
             "--options", '{"reasoningEffort": "medium"}',
@@ -300,10 +300,10 @@ class BackupCliTest(BackupCliCase):
         )
         self.assert_backup(completed, {
             "decision": "relaunch",
-            "role": "how explorer",
+            "role": "skill tests",
             "failed": "grok/grok-4.7",
             "seat": {"providerInstanceId": "claudeAgent", "model": "claude-sonnet-5-5", "options": {"effort": "medium"}},
-            "report": "how explorer: grok/grok-4.7 resumed on claudeAgent/claude-sonnet-5-5 at medium after the reset",
+            "report": "skill tests: grok/grok-4.7 resumed on claudeAgent/claude-sonnet-5-5 at medium after the reset",
         })
 
 

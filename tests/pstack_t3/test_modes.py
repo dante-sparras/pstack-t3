@@ -25,8 +25,8 @@ from tests.pstack_t3.support import pointer_sentence, unfenced_lines, heading_sl
 
 MODE_POINTER_SITES = {
     **{f"{name}/SKILL.md": "skill" for name in (
-        "poteto-mode", "how", "why", "architect", "arena", "no-comments", "swarm", "interrogate",
-        "show-me-your-work", "recall", "automate-me", "maintain-verification-skill", "reflect",
+        "poteto-mode", "how", "arena", "no-comments", "swarm", "interrogate",
+        "show-me-your-work", "recall", "automate-me", "maintain-verification-skill",
         "pstack-author-skill", "landing",
     )},
     **{f"poteto-mode/playbooks/{stem}.md": "playbook" for stem in (
@@ -124,12 +124,13 @@ class ModesTest(unittest.TestCase):
         text = (ROOT / "skills/poteto-mode/playbooks/opening-a-pr.md").read_text()
         blocks = text.split("\n\n")
         lead = [block.split(" ", 1)[0] for block in blocks]
-        self.assertLess(lead.index("**Descriptions.**"), lead.index("**Gate.**"))
-        self.assertLess(lead.index("**Gate.**"), lead.index("**Forge.**"))
-        self.assertIn("(../../pstack-runtime/SKILL.md#gate-review)", blocks[lead.index("**Gate.**")])
+        gate = lead.index("**Gate.**")
+        self.assertLess(lead.index("Title:"), gate)
+        self.assertLess(gate, next(i for i, block in enumerate(blocks) if block.startswith("Stack follow-ups by base branch.")))
+        self.assertIn("(../../pstack-runtime/SKILL.md#gate-review)", blocks[gate])
+        self.assertIn("Full mode skips it and runs `/no-comments` before review.", blocks[gate])
         child = next(block for block in blocks if block.startswith("A child task that opens a PR"))
         self.assertIn("that child runs the **Gate** paragraph above in place of `/no-comments`.", child)
-        self.assertIn("Run `/no-comments` before review.", text)
 
     def test_gate_contract_is_literal(self):
         self.assertEqual(gate_contract(self.gate), GATE_CONTRACT)
@@ -153,25 +154,19 @@ class ModesTest(unittest.TestCase):
             "Its brief lists every `threadId` that `t3_thread_list` returns in the window, across every page. The parent filters and samples none",
             light_row(light, "`automate-me`"),
         )
-        self.assertIn("pass `--session-mode full`", light_row(light, "`reflect`"))
+        self.assertIn("A user's explicit reflect runs in full and spawns no child.", light_row(light, "`reflect`"))
         verification = light_row(light, "Multi-phase verification")
-        self.assertIn("every **Verify, live** lane box that drives its surface", verification)
+        self.assertIn("carries every live box that drives its surface", verification)
         self.assertIn("Launch no perf lane.", verification)
         self.assertIn("(SKILL.md#gate-review)", verification)
 
-    def test_explicit_reflect_names_session_full_at_both_flag_sites(self):
+    def test_no_flag_site_carves_out_reflect_which_resolves_no_seat(self):
         roles = (ROOT / "t3/added/pstack-runtime/roles.md").read_text().split("## Where roles live", 1)[1].split("\n## ", 1)[0]
         paragraph = next(block for block in roles.split("\n\n") if block.startswith("When the brief this call seats"))
-        self.assertIn(
-            "except for a user's explicit reflect, which passes `--session-mode full`",
-            paragraph,
-        )
         resolve = self.runtime.split("### Resolve and carry the mode", 1)[1].split("\n### ", 1)[0]
-        self.assertIn("except the explicit reflect below", resolve)
-        self.assertIn(
-            "A user's explicit reflect passes `--session-mode full` on every `roles.py show` call",
-            resolve,
-        )
+        for site in (paragraph, resolve):
+            self.assertNotIn("--session-mode full", site)
+            self.assertNotIn("reflect", site)
 
     def test_automate_me_brief_lists_every_assigned_thread(self):
         text = (ROOT / "skills/automate-me/SKILL.md").read_text()
@@ -204,7 +199,7 @@ class ModesTest(unittest.TestCase):
 
     def test_full_mode_persona_keeps_investigation(self):
         persona = (ROOT / "skills/pstack-runtime/agents/comment-sicko.md").read_text()
-        self.assertIn("I run the **how** skill, the **why** skill, or both", persona)
+        self.assertIn("I trace the named symbol or call, run the **why** skill on it, or both.", persona)
 
     def test_gate_reuse_lives_in_gate_review(self):
         gate = (ROOT / "skills/pstack-runtime/gate-review.md").read_text()

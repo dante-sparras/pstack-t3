@@ -161,7 +161,7 @@ def check_tree(root, layout, guide=True):
             continue
         rel = file.relative_to(root)
         text = file.read_text()
-        rel_s = str(rel)
+        rel_s = rel.as_posix()
         for tool in REQUIRED_TOOLS.get(rel_s, ()):
             if tool not in text:
                 findings.append(f"{rel_s}: missing {tool}")

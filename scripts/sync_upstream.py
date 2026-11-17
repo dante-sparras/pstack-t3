@@ -385,7 +385,7 @@ def main():
     with tempfile.TemporaryDirectory(prefix="pstack-upstream-") as temporary:
         try:
             checkout = Path(temporary) / "plugins"
-            run("git", "clone", "--filter=blob:none", "--no-checkout", meta["repository"], str(checkout))
+            run("git", "clone", "--config", "core.autocrlf=false", "--filter=blob:none", "--no-checkout", meta["repository"], str(checkout))
             run("git", "sparse-checkout", "set", meta["path"], cwd=checkout)
             run("git", "checkout", args.ref, cwd=checkout)
             commit = run("git", "rev-parse", "HEAD", cwd=checkout)

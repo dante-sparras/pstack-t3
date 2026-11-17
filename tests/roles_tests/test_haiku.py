@@ -72,7 +72,7 @@ class Haiku55CliTest(unittest.TestCase):
         self.assertEqual(entry["haikuBrief"], HAIKU_BRIEF)
 
     def test_show_output_never_mentions_caps(self):
-        completed = show("bug-fix", "skill tests", "how explorer")
+        completed = show("bug-fix", "skill tests", "swarm workers")
         self.assertEqual(completed.returncode, 0, completed.stderr)
         lowered = completed.stdout.lower()
         self.assertNotIn("capped", lowered)
@@ -231,14 +231,14 @@ class BedrockHaikuBriefCliTest(unittest.TestCase):
         }]}
         with tempfile.TemporaryDirectory() as directory:
             repo = Repo(directory)
-            repo.put(repo.user, {"version": 1, "roles": {"how explorer": [seat]}})
+            repo.put(repo.user, {"version": 1, "roles": {"swarm workers": [seat]}})
             path = repo.directory / "catalog.json"
             repo.put(path, catalog)
             return repo.run(
                 "show",
                 "--catalog", str(path),
                 "--parent", f"opencode/{model_id}",
-                "--role", "how explorer",
+                "--role", "swarm workers",
             )
 
     def test_explicit_and_inherit_seats_get_haiku_brief(self):
@@ -249,7 +249,7 @@ class BedrockHaikuBriefCliTest(unittest.TestCase):
                 with self.subTest(model=model_id, seat=label):
                     completed = self.show(model_id, seat)
                     self.assertEqual(completed.returncode, 0, completed.stderr)
-                    entry = json.loads(completed.stdout)["roles"]["how explorer"]
+                    entry = json.loads(completed.stdout)["roles"]["swarm workers"]
                     expected = ["inherit"] if seat == "inherit" else [explicit]
                     self.assertEqual(entry["seats"], expected)
                     self.assertEqual(entry.get("haikuBrief"), HAIKU_BRIEF)

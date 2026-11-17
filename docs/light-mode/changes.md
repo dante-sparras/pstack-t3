@@ -6,12 +6,7 @@ Each row names one spawn. "Merged" means two passes become one. "Cheaper seat" m
 
 | Spawn | Full | Light | Kind |
 | --- | --- | --- | --- |
-| `how` simple | 1 explainer | 1 explainer | Kept |
-| `how` complex | 2 to 4 explorers and 1 explainer | 1 explainer, simple path always | Cut |
-| `why` investigators | 1 per category | Source control only | Cut |
-| `why` synthesizer | 1 child | The parent writes the synthesis | Merged |
-| `architect` grounding | A second `how` run | Reuses the playbook `how` output | Merged |
-| `architect` runners | 1 per seat | 1 runner on the first `architect runners` seat, asked for two structurally distinct sketches | Merged |
+| `how` | 1 explainer | 1 explainer | Kept |
 | Cross-judge | 1 child | The parent picks. The gate review reads the chosen design | Cut |
 | Arena | 1 per seat and a judge | The single code delegate. Eval keeps arena, because comparing candidates is its whole purpose | Cut |
 | Code delegate | 1 | 1. Hillclimb runs one live hypothesis at a time | Kept |
@@ -22,11 +17,10 @@ Each row names one spawn. "Merged" means two passes become one. "Cheaper seat" m
 | Description eval | 5 prompts, each sent to a fresh child | Only when the change edits a `description` | Cut |
 | `swarm` | N workers | At most 3 workers | Cut |
 | Trail reviewer | 1 child | Folded into the gate review when one runs at that head. Otherwise kept as the gate | Merged |
-| `reflect` | 3 and 1 | A scheduled reflect does not run. A user explicit reflect runs in full | Cut |
-| Recall slices | 1 per slice | At most 3 slices, and no `why` wave unless asked | Cut |
+| `reflect` | None | A scheduled reflect does not run. A user explicit reflect runs in full | Cut |
+| Recall slices | 1 per slice, plus 1 per source | At most 3 slices, and no source investigators unless asked | Cut |
 | Automate-me miners | 1 per slice | 1 miner over the whole window | Cut |
 | Verification source wave | 1 per feature file | At most 3 children, each reading a batch of feature files | Cut |
-| Multi-phase exploration | Several | 1 explorer | Cut |
 | Multi-phase verification | Full lanes | Gates, one live lane per surface, and one audit lane on another family, or a same-family read when only the author's family has a runnable seat. No perf lane | Cut |
 | Autopilot owner | 1 per PR | 1 per PR, with `Mode: light` in its brief | Kept |
 | Autopilot verification | Full lanes | 2 lanes. Gates, which keeps the patch-id rule, and one audit lane on another family, or a same-family read when only the author's family has a runnable seat, that is the gate review and runs at every new head SHA | Cut |

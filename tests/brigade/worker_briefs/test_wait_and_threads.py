@@ -68,7 +68,7 @@ class WaitThreadsMixin:
         self.assertIn("code delegate, claims check, and architect runner", threads)
         self.assertIn("A missing section adds no row and is not an error.", threads)
 
-    def test_threads_sentence_bars_a_seat_suffix_backticks_and_a_how_explainer(self):
+    def test_threads_sentence_bars_a_seat_suffix_and_backticks(self):
         self.coordinator()
         text = self.brigade(*self.BRIEF)
         threads = next(line for line in text.splitlines() if line.startswith("- Hold a `## Threads`"))
@@ -78,7 +78,6 @@ class WaitThreadsMixin:
         self.assertIn("List only code delegate, claims check, and architect runner under ## Threads", threads)
         self.assertIn("Put every other child under ## Notes", threads)
         self.assertIn("Name a child run inside the worker's own harness in the report body instead, never in the section.", threads)
-        self.assertNotIn("such as a how explainer", threads)
         self.assertNotIn("Name any other child", threads)
         self.assertIn("List only T3 threads started with `delegate_task` or `t3_thread_launch`", threads)
 

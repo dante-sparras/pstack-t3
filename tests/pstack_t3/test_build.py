@@ -73,7 +73,8 @@ class BuildTest(unittest.TestCase):
     def test_vendor_playbook_entries_match_playbook_files(self):
         import catalog
         resolved = {title: file for title, file, _ in catalog.playbook_entries(ROOT / "vendor/pstack/skills")}
-        self.assertEqual(resolved, PLAYBOOK_FILES)
+        added_by_pstack_t3 = {"Orchestrate"}
+        self.assertEqual(resolved, {title: file for title, file in PLAYBOOK_FILES.items() if title not in added_by_pstack_t3})
         self.assertEqual(catalog.missing_playbooks(ROOT / "vendor/pstack/skills"), [])
 
     def test_a_skill_with_no_playbooks_heading_returns_nothing(self):
@@ -85,6 +86,23 @@ class BuildTest(unittest.TestCase):
             (skill / "SKILL.md").write_text("---\nname: poteto-mode\ndescription: d\n---\n\n# Poteto mode\n")
             self.assertEqual(catalog.playbook_entries(root), [])
             self.assertEqual(catalog.missing_playbooks(root), [])
+
+    def test_a_line_of_titles_names_one_playbook_per_title(self):
+        import catalog
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            skill = root / "poteto-mode"
+            (skill / "playbooks").mkdir(parents=True)
+            (skill / "playbooks/bug-fix.md").write_text("### Bug fix\n")
+            (skill / "SKILL.md").write_text(
+                "---\nname: poteto-mode\ndescription: d\n---\n\n## Playbooks\n\nMatch the task to a playbook.\n\nBug fix, Opening a PR.\n"
+            )
+            self.assertEqual(catalog.playbook_entries(root), [("Bug fix", "playbooks/bug-fix.md", ""), ("Opening a PR", "playbooks/opening-a-pr.md", "")])
+            self.assertEqual(
+                catalog.missing_playbooks(root),
+                ['poteto-mode/SKILL.md: playbook "Opening a PR" resolves to playbooks/opening-a-pr.md, which does not exist'],
+            )
+            self.assertIn("| Playbook |\n| --- |\n| [Bug fix](../skills/poteto-mode/playbooks/bug-fix.md) |", catalog.render(root))
 
     def test_playbooks_extra_does_not_open_the_section(self):
         import catalog

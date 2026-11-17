@@ -67,14 +67,14 @@ Correct the log, not the story. The audit never edits or removes a row, even an 
 
 [The runtime's Modes section](../pstack-runtime/SKILL.md#modes) sets the mode lines of every brief this skill writes and how its spawns run in light mode.
 
-Before handing back, spawn a child with `delegate_task` (`role: "review"`, a read-only brief) whose `target` is on a different model family from the one that did the work. Pick it from `orchestrator_capabilities`, preferring a provider other than this thread's (the runtime's [Roles section](../pstack-runtime/SKILL.md#roles)). Self-review is not a substitute. Give it the log path and this run's `threadId`. The child reads the audit trail and the run's thread with `t3_thread_read`, then flags what the user should pay attention to. Not a redo of the work, a scan for what's suboptimal or risky. Follow the Subagents section of the poteto-mode skill.
+Before handing back, spawn a child with `delegate_task` (`role: "review"`, a read-only brief) whose `target` is another vendor's model than the one that did the work. Pick it from `orchestrator_capabilities`, preferring a provider other than this thread's (the runtime's [Roles section](../pstack-runtime/SKILL.md#roles)). Self-review is not a substitute. Give it the log path and this run's `threadId`. The child reads the audit trail and the run's thread with `t3_thread_read`, then flags what the user should pay attention to. Not a redo of the work, a scan for what's suboptimal or risky. Follow the Subagents section of the poteto-mode skill.
 
 - Decisions logged with weak or absent evidence.
 - Verification steps skipped or claimed without proof in the thread.
 - Choices that look risky in hindsight (premature, scope-creeping, papering over a symptom).
 - Gaps the user would otherwise miss on a casual skim.
 
-Every reply for a run that produced a trail ends with an "Attention" section. Lead with the reviewer's model on its own line (`reviewed by <model>`), then list each flag pointing to specific rows or moments. "No flags" is a valid value. The model name is not. When only this thread's model family is runnable, the reviewer runs on it anyway and the `reviewed by` line says the family did not differ.
+Every reply for a run that produced a trail ends with an "Attention" section. Lead with the reviewer's model on its own line (`reviewed by <model>`), then list each flag pointing to specific rows or moments. "No flags" is a valid value. The model name is not. When only this thread's vendor is runnable, the reviewer runs on it anyway and the `reviewed by` line says the vendor did not differ.
 
 ## Reviewing the trail
 
