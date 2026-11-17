@@ -26,6 +26,8 @@ python3 scripts/install.py
 python3 scripts/install.py doctor
 ```
 
+On Windows, run the same commands with `python` in place of `python3`. The installer links each skill with a directory junction there, so it needs neither Developer Mode nor an administrator shell.
+
 `doctor` should show `63/63 pstack-t3` for each provider you use. If it reports other copies of the same skills, you have an older pstack installed. Rerun with `python3 scripts/install.py --replace` to move it aside. `uninstall` puts it back when it can do so without overwriting anything, as the [Uninstall](guide/uninstall.md#uninstall) section describes.
 
 `install` exits 3 when the run printed a line that begins `skipped`, as the **A skipped step exits 3.** bullet under [Uninstall](guide/uninstall.md#uninstall) describes.

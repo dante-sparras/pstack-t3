@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import shlex
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -10,6 +9,7 @@ from . import moves
 from . import plans
 from . import records
 from . import strays
+from . import system
 
 def points_here(path):
     return layout.proves(str(layout.ROOT), os.fspath(path), os.fspath(path))
@@ -93,9 +93,9 @@ AWAY = ('{file}: claims {n} links here for checkout {checkout}, and no directory
         'and removes no link they name and no row of {manifest}')
 
 def command(args, *words):
-    """One shell command for a person to copy and run from this checkout. Every argument is quoted for a POSIX shell as needed."""
+    """One shell command for a person to copy and run from this checkout. Every argument is quoted for this platform's shell as needed."""
     project = (f"--project={args.project}",) if args.project else ()
-    return shlex.join(("python3", "scripts/install.py", *words, *project))
+    return system.command_line(("python3", "scripts/install.py", *words, *project))
 
 def claim_finding(args, state, root, path, harnesses, aside, planned):
     """The Finding for one stale claim.

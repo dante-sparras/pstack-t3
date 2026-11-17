@@ -6,9 +6,7 @@ from dataclasses import dataclass
 from . import layout
 from . import records
 from . import strays
-
-# Linux opens the entry itself with O_PATH. macOS opens a symlink itself with O_SYMLINK, and O_NONBLOCK keeps a FIFO from blocking.
-HOLD_FLAGS = (os.O_PATH | os.O_NOFOLLOW) if hasattr(os, "O_PATH") else (os.O_RDONLY | getattr(os, "O_SYMLINK", os.O_NOFOLLOW) | os.O_NONBLOCK)
+from . import system
 
 @dataclass(frozen=True)
 class Held:
@@ -20,7 +18,7 @@ class Held:
 def hold(path, holds):
     """Open the entry at `path` itself and keep it open until `holds` closes. Return what restore needs to prove it is still there."""
     try:
-        fd = os.open(path, HOLD_FLAGS)
+        fd = system.open_entry(path)
     except OSError as error:
         return Held(None, None, error.strerror or str(error))
     holds.callback(os.close, fd)
@@ -81,7 +79,7 @@ def plan_install(view, scope, user, selected, names, root, replace):
             if os.path.lexists(path):
                 conflicts.append((harnesses, path))
                 if replace:
-                    steps.append(Step("move", path, place=f"{harnesses[0]}/{name}", harnesses=harnesses))
+                    steps.append(Step("move", path, place=os.path.join(harnesses[0], name), harnesses=harnesses))
             if not os.path.lexists(path) or replace:
                 row = {"harnesses": list(harnesses), "path": path, "checkout": root}
                 add_links = () if tagged_exists(view, path, root) else (row,)
@@ -90,8 +88,8 @@ def plan_install(view, scope, user, selected, names, root, replace):
 
 def occupied_note(row):
     path, backup = row.original, row.backup
-    if os.path.islink(path):
-        spelled = os.path.normpath(os.path.join(os.path.dirname(path), os.readlink(path)))
+    if system.is_link(path):
+        spelled = os.path.normpath(os.path.join(os.path.dirname(path), system.read_link(path)))
         parent = os.path.dirname(spelled)
         if os.path.basename(spelled) == os.path.basename(path) and os.path.basename(parent) == "skills":
             checkout = os.path.dirname(parent)

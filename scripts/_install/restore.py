@@ -9,6 +9,7 @@ from contextlib import ExitStack, suppress
 from . import layout
 from . import moves
 from . import plans
+from . import system
 
 CHANGED = "the backup is no longer the entry uninstall read"
 
@@ -36,7 +37,7 @@ def place_copy(source, path, source_fd):
     with moves.Holder(path, moves.SCRAP) as holder:
         copy = holder.aside
         try:
-            if os.path.isdir(source) and not os.path.islink(source):
+            if os.path.isdir(source) and not system.is_link(source):
                 shutil.copytree(source, copy, symlinks=True)
             else:
                 shutil.copy2(source, copy, follow_symlinks=False)

@@ -59,7 +59,7 @@ def new_file(directory):
     tempfile.mkstemp is not used because it passes its directory through os.path.abspath. Like mkstemp, this passes
     mode 0o600 to os.open. After 100 names that are taken it raises FileExistsError.
     """
-    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW
+    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
     for _attempt in range(100):
         temporary = os.path.join(directory, f"tmp{os.urandom(4).hex()}")
         try:
