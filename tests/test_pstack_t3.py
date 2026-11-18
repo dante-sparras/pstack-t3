@@ -21,7 +21,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 import check  # noqa: E402
 from tests.pstack_t3.support import (
-    PREVIEW_TOOLS, fragment_holds_bullets, heading_slug, release_bullets, runtime_docs, unfenced_lines,
+    PREVIEW_TOOLS, heading_slug, runtime_docs, unfenced_lines,
 )
 
 def fence_git_environment():

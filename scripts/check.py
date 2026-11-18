@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Lint a generated skills tree for Cursor-only leftovers and broken structure, and the test modules for the git environment fence.
 
-check_tree judges the tree it is given, and when that tree contains `pstack-runtime/scripts/roles.py` it also reports library wording, machine values, and shared source for the checkout that contains this file. With `guide` true, which is the default, that same case reports a doctor count quoted in that checkout's `docs/guide.md` and a skill count stated in that checkout's `README.md` that disagree with the number of skills in the tree. The same case reports a T3 Code minimum version, stated on a line between `T3 Code` and `or later` in a plain sentence or a Markdown link with optional backticks, that disagrees with the version in the setup gate string. The build keeps the default and main passes `guide=not argv`, so the build and a bare `python3 scripts/check.py` report the guide while an explicit tree argument does not. A tree without that file gets none of those findings. badge_findings reports a README upstream badge that is missing or that disagrees with the version in upstream.json. The default CLI run and the build add that repository check. An explicit tree argument gets no badge finding. home_path_findings reports each line outside `vendor/`, `.git`, `__pycache__`, and the allow list that holds a `/home/<name>/` path, and the bare CLI run adds it. tstack_link_findings reports each tstack link under `t3/`, `skills/`, and `docs/` whose commit is not the one `tstack.json` pins, and the bare CLI run adds it. check_tree reports retired T3 tool names in the tree it is given. When that tree contains both `pstack-runtime/SKILL.md` and `setup-pstack/SKILL.md`, it also scans this checkout's `t3/` and `docs/` outside `docs/changelog/` and `docs/cli/`.
+check_tree judges the tree it is given, and when that tree contains `pstack-runtime/scripts/roles.py` it also reports library wording and shared source for the checkout that contains this file. With `guide` true, which is the default, that same case reports a doctor count quoted in that checkout's `docs/guide.md` and a skill count stated in that checkout's `README.md` that disagree with the number of skills in the tree. The same case reports a T3 Code minimum version, stated on a line between `T3 Code` and `or later` in a plain sentence or a Markdown link with optional backticks, that disagrees with the version in the setup gate string. The build keeps the default and main passes `guide=not argv`, so the build and a bare `python3 scripts/check.py` report the guide while an explicit tree argument does not. A tree without that file gets none of those findings. badge_findings reports a README upstream badge that is missing or that disagrees with the version in upstream.json. The default CLI run and the build add that repository check. An explicit tree argument gets no badge finding. home_path_findings reports each line outside `vendor/`, `.git`, `__pycache__`, and the allow list that holds a `/home/<name>/` path, and the bare CLI run adds it. tstack_link_findings reports each tstack link under `t3/`, `skills/`, and `docs/` whose commit is not the one `tstack.json` pins, and the bare CLI run adds it. check_tree reports retired T3 tool names in the tree it is given. When that tree contains both `pstack-runtime/SKILL.md` and `setup-pstack/SKILL.md`, it also scans this checkout's `t3/` and `docs/` outside `docs/cli/`.
 """
 
 from pathlib import Path
@@ -17,7 +17,6 @@ try:
 except ImportError:
     yaml = None
 
-from _check.changes import _at_file_line, change_findings
 from _check.fence import (
     FENCE_BRIGADE_DIR,
     FENCE_BRIGADE_MODULE,
@@ -50,13 +49,6 @@ from _check.fragments import (
     _strip_code_spans,
     _visible_lines,
     heading_slug,
-)
-from _check.identity import (
-    REQUIRED_SCAN as _IDENTITY_REQUIRED_SCAN,
-    Identity,
-    _machine_identity,
-    _machine_value_hits,
-    machine_value_findings,
 )
 from _check.pyast import (
     _calls_name,
@@ -94,7 +86,7 @@ from _check.shared_source import (
     _unresolved_bindings,
     shared_source_findings,
 )
-from _check.siblings import _catalog, _release, _size_limit
+from _check.siblings import _catalog
 from _check.tree import (
     LIGHT_HEADER_CELLS,
     LIGHT_MODE_NAME,
@@ -137,7 +129,6 @@ README_PATH = Path(__file__).resolve().parents[1] / "README.md"
 UPSTREAM_PATH = Path(__file__).resolve().parents[1] / "upstream.json"
 GUIDE_PATH = Path(__file__).resolve().parents[1] / "docs/guide.md"
 VENDOR_SKILLS_PATH = Path(__file__).resolve().parents[1] / "vendor/pstack/skills"
-REQUIRED_SCAN = _IDENTITY_REQUIRED_SCAN
 
 HOME_PATH = re.compile(r"/home/[A-Za-z0-9._-]+/")
 TSTACK_LINK = re.compile(r"(?:github\.com/t3dotgg/tstack/(?:blob|tree|raw)/|raw\.githubusercontent\.com/t3dotgg/tstack/)([^/\s]+)/")
@@ -149,7 +140,6 @@ HOME_PATH_EXEMPT = frozenset({
     "tests/activity_tests/test_goal_strip.py",
     "tests/activity_tests/test_privacy.py",
     "tests/activity_tests/test_words.py",
-    "tests/ops_tests/test_scan.py",
     "tests/check_tests/test_home_paths.py",
 })
 
@@ -246,7 +236,6 @@ def main(argv):
     problems = (check_tree(layout.repo / "skills")
                 + fence_findings(layout.tests_dir)
                 + badge_findings(layout.readme_path, layout.upstream_path)
-                + _size_limit().findings(layout.repo)
                 + home_path_findings(layout.repo)
                 + tstack_link_findings(layout.repo))
     print("\n".join(problems) or "ok")

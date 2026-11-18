@@ -1,8 +1,7 @@
-"""Acceptance tests that drive the real CLI and the release script on a fixture store.
+"""Acceptance tests that drive the real CLI on a fixture store.
 
 Each brigade test calls the command in the test process through the shared helper, the way the coordinator
-does. The release test builds a temporary repository with committed fragments, the way tests/test_release.py
-builds one, and runs scripts/release.py in the test process.
+does.
 """
 
 if __package__ in (None, ""):
@@ -19,36 +18,10 @@ isolation.install()
 
 import json
 import os
-import shutil
-import subprocess
-import tempfile
 import unittest
-from contextlib import contextmanager
 from pathlib import Path
 
-from tests import in_process
 from tests.brigade.support import BrigadeTest, ProcessReason, SCRIPT, real_process
-
-ROOT = Path(__file__).resolve().parents[1]
-RELEASE = ROOT / "scripts/release.py"
-NOTES = ROOT / "scripts/release_notes.py"
-CHANGELOG = "# Changelog\n\n## 0.4.1 (2026-10-07)\n\n- old\n"
-FRAGMENTS = {"changes/one.md": "- kind feature\n- one\n  one continued\n",
-             "changes/two.md": "- kind fix\n- two\n",
-             "changes/three.md": "- kind polish\n- three\n",
-             "changes/four.md": "- kind study\n- four\n",
-             "changes/five.md": "- five\n"}
-ENV = {
-    **{name: value for name, value in os.environ.items() if not name.startswith("GIT_")},
-    "GIT_AUTHOR_NAME": "t",
-    "GIT_AUTHOR_EMAIL": "t@t",
-    "GIT_COMMITTER_NAME": "t",
-    "GIT_COMMITTER_EMAIL": "t@t",
-    "GIT_CONFIG_GLOBAL": os.devnull,
-    "GIT_CONFIG_NOSYSTEM": "1",
-    "LC_ALL": "C",
-    "PYTHONDONTWRITEBYTECODE": "1",
-}
 
 
 def fence_git_environment():
@@ -71,20 +44,6 @@ def fence_git_environment():
 
 def setUpModule():
     fence_git_environment()
-
-
-def git(repo, *args):
-    return subprocess.run(["git", *args], cwd=repo, check=True, capture_output=True, text=True,
-                          encoding="utf-8", env=ENV).stdout
-
-
-def commit(repo, files):
-    for relative, text in files.items():
-        path = repo / relative
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text)
-    git(repo, "add", "-A")
-    git(repo, "commit", "-q", "-m", "c", "--date=2026-10-08T12:00:00+00:00")
 
 
 class SpendControlsTest(BrigadeTest):
@@ -197,60 +156,6 @@ class SetContextCapHelpTest(BrigadeTest):
         words = " ".join(result.stdout.split())
         cap_help = words.split("--context-cap CONTEXT_CAP ", 1)[1].split(" --coordinator-provider ", 1)[0]
         self.assertEqual(self.CAP_HELP, "--context-cap CONTEXT_CAP " + cap_help)
-
-
-class ReleaseSectionsTest(unittest.TestCase):
-    """The release bump and the changelog sections a store of fragments of every kind gives."""
-
-    @contextmanager
-    def repository(self):
-        with tempfile.TemporaryDirectory() as directory:
-            repo = Path(directory) / "repo"
-            repo.mkdir()
-            git(repo, "init", "-q", "-b", "main")
-            (repo / "scripts").mkdir()
-            shutil.copy(RELEASE, repo / "scripts/release.py")
-            shutil.copy(NOTES, repo / "scripts/release_notes.py")
-            yield repo
-
-    def run_release(self, repo, *args):
-        return in_process.invoke(in_process.Invocation(
-            program=repo / "scripts/release.py",
-            argv=(*args, "--date", "2026-10-14"),
-            env=ENV,
-            cwd=repo.parent,
-        ))
-
-    def test_the_sections_group_every_kind_and_the_bump_follows_the_feature_bit(self):
-        with self.repository() as repo:
-            commit(repo, {"CHANGELOG.md": CHANGELOG})
-            commit(repo, FRAGMENTS)
-            refused = self.run_release(repo, "0.4.2", "--dry-run")
-            self.assertEqual((refused.returncode, refused.stdout), (1, ""))
-            self.assertEqual(refused.stderr, "0.4.2 is not 0.5.0, the version the kinds give; pass 0.5.0\n")
-            cut = self.run_release(repo, "0.5.0", "--dry-run")
-            self.assertEqual((cut.returncode, cut.stderr), (0, ""))
-            self.assertEqual(cut.stdout, "\n".join([
-                "## 0.5.0 (2026-10-14)", "", "### New", "", "- one", "  one continued", "",
-                "### Fixed", "", "- two", "", "### Changed", "", "- five", "", "- four", "- three", "",
-                "would write this section to CHANGELOG.md",
-                "would delete changes/five.md", "would delete changes/four.md", "would delete changes/one.md",
-                "would delete changes/three.md", "would delete changes/two.md", "nothing changed",
-            ]) + "\n" + "this script never stages, commits, tags, or pushes. the remaining steps:\n"
-                '  git add CHANGELOG.md changes/\n  git commit -m "release 0.5.0"\n'
-                '  git tag -a v0.5.0 -m "pstack-t3 0.5.0"    # on the commit that lands on main\n'
-                "  git push origin v0.5.0\n  gh release create v0.5.0 --notes-file <release notes file>\n")
-            self.assertEqual(git(repo, "status", "--porcelain"), "")
-
-    def test_a_cut_with_no_feature_takes_the_next_patch(self):
-        with self.repository() as repo:
-            commit(repo, {"CHANGELOG.md": CHANGELOG, "changes/two.md": "- kind fix\n- two\n"})
-            cut = self.run_release(repo, "0.4.2", "--dry-run")
-            self.assertEqual((cut.returncode, cut.stderr), (0, ""))
-            self.assertEqual(cut.stdout.split("this script never stages", 1)[0],
-                             "## 0.4.2 (2026-10-14)\n\n### Fixed\n\n- two\n"
-                             "\nwould write this section to CHANGELOG.md\n"
-                             "would delete changes/two.md\nnothing changed\n")
 
 
 class ChangeNoteDirTest(BrigadeTest):

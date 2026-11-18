@@ -1,2 +1,0 @@
-- kind fix
-- `scripts/install.py` install, doctor, and uninstall now run on Windows as well as Linux and macOS. On Windows each skill link is a directory junction, so the install needs neither Developer Mode nor an administrator shell. A new `install` workflow runs `scripts/install_smoke.py` on Linux and Windows

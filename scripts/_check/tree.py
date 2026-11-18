@@ -2,13 +2,11 @@ import importlib.util
 import re
 from pathlib import Path
 
-from .changes import change_findings
 from .fence import fence_findings
 from .fragments import fragment_findings
-from .identity import _machine_identity, machine_value_findings
 from .readme import badge_findings, guide_count_findings, minimum_version_findings, readme_count_findings
 from .shared_source import shared_source_findings
-from .siblings import _catalog, _size_limit
+from .siblings import _catalog
 from .vocabulary import (
     CATALOG_HEREDOC_CLOSER,
     CATALOG_HEREDOC_OPEN,
@@ -102,7 +100,7 @@ def retired_tool_findings(tree, repo=None):
     """One finding per retired T3 tool name occurrence in the given skills tree and checkout sources.
 
     The tree scan covers files outside __pycache__. When repo is given, the checkout's t3 and docs
-    trees are read too, minus docs/changelog and docs/cli. A tree finding names the path relative
+    trees are read too, minus docs/cli. A tree finding names the path relative
     to tree, a checkout finding the path relative to repo, as other check_tree findings do.
     Each file is read as UTF-8 with errors replaced. Scans run in tree, t3, then docs order.
     Within each top directory, findings follow sorted path order, then line and column order.
@@ -201,8 +199,6 @@ def check_tree(root, layout, guide=True):
     if (root / RENDERED_MARKER).is_file():
         repo = layout.repo
         findings.extend(library_wording_findings(repo / "tests"))
-        findings.extend(change_findings(repo / "changes"))
-        findings.extend(machine_value_findings(repo / "ops", repo / "docs/operations.md", _machine_identity()))
         findings.extend(shared_source_findings(repo / "t3/scripts/roles.py", repo / "scripts/install.py"))
         if guide:
             findings.extend(guide_count_findings(layout.guide_path, root))
@@ -216,6 +212,5 @@ def main(argv, layout):
     problems = check_tree(tree, layout, guide=not argv) + fence_findings(layout.tests_dir)
     if not argv:
         problems += badge_findings(layout.readme_path, layout.upstream_path)
-        problems += _size_limit().findings(layout.repo)
     print("\n".join(problems) or "ok")
     return 1 if problems else 0

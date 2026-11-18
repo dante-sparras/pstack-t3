@@ -2,7 +2,6 @@ import json
 import os
 import re
 import shutil
-import subprocess
 import sys
 import tempfile
 import textwrap
@@ -140,77 +139,6 @@ def light_row(runtime, spawn):
     if len(matches) != 1:
         raise AssertionError(f"{spawn}: expected 1 light row, found {len(matches)}")
     return matches[0]
-def fragment_name(branch):
-    return branch.replace("%", "%25").replace("/", "%2F") + ".md"
-def fragment_holds_bullets(lines):
-    open_bullet = False
-    for line in lines:
-        if line.startswith("- ") and line[2:].strip():
-            open_bullet = True
-            continue
-        if open_bullet and (line.startswith(" ") or line.startswith("\t")) and line.strip():
-            continue
-        return False
-    return open_bullet
-def changelog_findings(root):
-    findings = []
-    changelog = root / "CHANGELOG.md"
-    if changelog.is_file():
-        for line in changelog.read_text().splitlines():
-            if line.strip() == "## Unreleased":
-                findings.append(
-                    "CHANGELOG.md has a ## Unreleased heading. Write the bullet under changes/."
-                )
-                break
-    changes = root / "changes"
-    if not changes.is_dir():
-        return findings
-    for path in sorted(p for p in changes.rglob("*") if p.is_file()):
-        relative = path.relative_to(changes).as_posix()
-        if "/" in relative:
-            findings.append(f"changes/{relative} sits in a subdirectory. changes/ is flat.")
-            continue
-        if not fragment_holds_bullets(path.read_text().splitlines()):
-            findings.append(f"changes/{relative} holds a line that is not a bullet.")
-    return findings
-def _git(repo, *args):
-    return subprocess.run(
-        ["git", *args],
-        cwd=repo,
-        check=True,
-        capture_output=True,
-        text=True,
-        env={
-            **os.environ,
-            "GIT_AUTHOR_NAME": "t",
-            "GIT_AUTHOR_EMAIL": "t@t",
-            "GIT_COMMITTER_NAME": "t",
-            "GIT_COMMITTER_EMAIL": "t@t",
-            "LC_ALL": "C",
-        },
-    ).stdout
-def release_bullets(repo):
-    log = _git(
-        repo,
-        "log",
-        "--reverse",
-        "--diff-filter=A",
-        "--format=",
-        "--name-only",
-        "--",
-        "changes/",
-    )
-    order = []
-    for line in log.splitlines():
-        if not line.startswith("changes/") or line.count("/") != 1 or not (repo / line).is_file():
-            continue
-        if line in order:
-            order.remove(line)
-        order.append(line)
-    bullets = []
-    for relative in order:
-        bullets.extend((repo / relative).read_text().splitlines())
-    return bullets
 RUNTIME_DOCS = ("SKILL.md", "threads.md", "host.md", "verification.md", "roles.md", "failures.md", "light.md", "gate-review.md", "delegation.md", "modes.md", "isolation.md", "watching.md")
 def runtime_docs():
     """The RUNTIME_DOCS members joined in order, read from the built skills tree."""

@@ -58,7 +58,7 @@ RETIRED_TOOL = re.compile(
     r"(?<![A-Za-z0-9])(?:" + "|".join(sorted(RETIRED_TOOLS, key=len, reverse=True)) + r")(?![A-Za-z0-9_])"
 )
 RETIRED_SOURCE_TOPS = ("t3", "docs")
-RETIRED_SKIPPED = (("docs", "changelog"), ("docs", "cli"))
+RETIRED_SKIPPED = (("docs", "cli"),)
 CATALOG_HEREDOC_OPEN = "<<'JSON'"
 CATALOG_HEREDOC_CLOSER = "JSON"
 RENDERED_MARKER = Path("pstack-runtime/scripts/roles.py")
