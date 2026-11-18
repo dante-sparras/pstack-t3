@@ -16,9 +16,6 @@ directory under the parent for TLC's own state and deletes that directory, by it
 exact path, when TLC exits. Without the argument it prints a usage error naming
 `--scratch-parent` and runs nothing.
 
-The skill at `.claude/skills/verify-landing-queue/SKILL.md` says when to run it,
-how to read a result, and how to keep it in step with the code.
-
 TLA+ checks this model. It does not read the Python. A pass says the promises
 hold for the modelled actions inside the stated bound. An unchanged model passes
 after a real code regression, so a pass alone does not show the model matches
