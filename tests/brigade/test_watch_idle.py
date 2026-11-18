@@ -145,15 +145,6 @@ class WatchIdleTest(BrigadeTest):
         self.assertNotIn("idle since", out)
         self.assertIn("D1: running 0m of 60m (thread thread-9)", out)
 
-    def test_running_with_no_completed_prints_running(self):
-        self.open()
-        self.fire_one(timebox="60")
-        home = self._t3home()
-        _make_db(home, [("thread-9", "running", _stamp(2), None, _stamp(2))])
-        out = self._watch_with_home(home)
-        self.assertNotIn("idle since", out)
-        self.assertIn("D1: running 0m of 60m (thread thread-9)", out)
-
     def test_report_present_prints_report_not_idle(self):
         self.open()
         self.fire_one(timebox="60")
