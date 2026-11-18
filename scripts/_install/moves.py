@@ -9,7 +9,6 @@ import sys
 import tempfile
 from contextlib import suppress
 from dataclasses import dataclass
-from pathlib import Path
 
 from . import layout
 from . import system

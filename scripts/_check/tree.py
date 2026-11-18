@@ -22,7 +22,6 @@ from .vocabulary import (
     RETIRED_TOOL,
     RETIRED_TOOLS,
     THREAD_LINK,
-    Layout,
 )
 from .wording import library_wording_findings
 

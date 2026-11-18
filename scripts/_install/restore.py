@@ -3,7 +3,6 @@ from __future__ import annotations
 import errno
 import os
 import shutil
-import sys
 from contextlib import ExitStack, suppress
 
 from . import layout

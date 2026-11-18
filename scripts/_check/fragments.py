@@ -2,7 +2,6 @@ import re
 import urllib.parse
 from pathlib import Path
 
-from .vocabulary import Layout
 
 FRAGMENT_DIRS = ("brigade", "brigade-admin", "pstack-runtime")
 FRAGMENT_LINK = re.compile(r"\]\(\s*([^\s)]*#[^\s)]*)\s*(?:\"(?:[^\"\\]|\\.)*\"|'(?:[^'\\]|\\.)*'|\((?:[^)\\]|\\.)*\))?\s*\)")

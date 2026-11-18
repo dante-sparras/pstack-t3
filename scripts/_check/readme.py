@@ -1,6 +1,5 @@
 import json
 import re
-from pathlib import Path
 
 from .vocabulary import REQUIRED_TOOLS, SETUP_GATE
 _VERSION_TOKEN = r"[0-9]+(?:\.[0-9]+)+"
