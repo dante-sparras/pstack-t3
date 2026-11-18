@@ -59,7 +59,7 @@ def rewrite_links(root, old, new):
             text = path.read_bytes().decode("utf-8", errors="replace")
             fixed = TSTACK_LINK.sub(lambda match: match.group(0).replace(f"/{old}/", f"/{new}/") if match.group(1) == old else match.group(0), text)
             if fixed != text:
-                path.write_text(fixed, encoding="utf-8")
+                path.write_text(fixed, encoding="utf-8", newline="\n")
                 changed.append(path.relative_to(root).as_posix())
     return changed
 
@@ -98,7 +98,7 @@ def main(argv=None, root=ROOT, gh=gh_api):
         return 0
     changed = rewrite_links(Path(root), old, new)
     pin["commit"] = new
-    pin_path.write_text(json.dumps(pin, indent=2) + "\n", encoding="utf-8")
+    pin_path.write_text(json.dumps(pin, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(f"pinned {new} in tstack.json; rewrote {', '.join(changed) or 'no links'}; run python3 scripts/build.py")
     return 0
 

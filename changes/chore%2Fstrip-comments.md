@@ -1,4 +1,0 @@
-- kind upkeep
-- Every code comment is gone from scripts, tests, `t3/`, `ops/`, `verification/`, workflows, `vendor/pstack/`, and the generated `skills/`. Shebangs, encoding lines, and lint or type directives stay. `worktree-audit.sh --help` prints the same text from a heredoc instead of its header comment.
-- `scripts/comments.py` lists or deletes code comments in the files git tracks. The `comments` workflow runs it on Linux and Windows and fails on any comment.
-- `scripts/sync_upstream.py` deletes upstream's comments before it compares, merges, or copies, so `vendor/pstack` holds upstream without comments and the lock pins those files.

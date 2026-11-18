@@ -1,8 +1,0 @@
-- kind upkeep
-- `vendor/pstack/` matches upstream's `pstack/` tree at 2f87c854 (pstack 0.15.43). Upstream cut how, why, reflect, and architect to short single files, shortened poteto-mode, Babysit, Opening a PR, Multi-phase plan, unslop, technical-writing, and fourteen principle leaves, added `poteto-mode/worker.md`, deleted its Orchestrate playbook, and moved its model defaults to Opus 5.5 with Fable 5.2 as an exception.
-- Every override and persona upstream changed is re-ported onto the new text. The overrides for architect and why are deleted, because the new upstream files hold no Cursor mechanism. The how explorers, the reflect reviewers and synthesizer, and `check-plan.mjs` are gone with their upstream files.
-- Orchestrate stays as a pstack-t3 playbook at `t3/added/poteto-mode/playbooks/orchestrate.md`, because brigade, the runtime, and light mode route standing programs to it.
-- `roles.py` retires `hardest tasks`, `how explorer`, `how explainer`, `why investigators`, `why synthesizer`, `reflect tooling`, `reflect judgment, divergent, synthesizer`, and `architect runners`. A roles file that still names one loads, and the next `write` drops it.
-- Every `delegate_task` brief and `t3_thread_launch` prompt opens with the pointer to poteto-mode's `worker.md`. `roles.py check-brief` accepts that line above the persona.
-- `scripts/catalog.py` reads upstream's one-line playbook list.
-- `scripts/sync_upstream.py` clones upstream with `core.autocrlf=false`, and the build's identity and light-mode checks run on Windows.

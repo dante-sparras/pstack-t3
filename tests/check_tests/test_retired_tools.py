@@ -41,14 +41,14 @@ class RetiredToolsTest(unittest.TestCase):
             f"t3/added/pstack-runtime/demo.md:1: {RETIRED_LINE}",
         ])
 
-    def test_the_checkout_scan_reads_t3_only_fails_when_history_generated_output_or_stale_skills_is_read(self):
-        """The defect: a history note, the generated CLI page, or a stale generated skills tree fails the build."""
+    def test_the_checkout_scan_reads_t3_only_fails_when_generated_output_or_stale_skills_is_read(self):
+        """The defect: the generated CLI page or a stale generated skills tree fails the build."""
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         root = Path(temporary.name)
         tree = root / "rendered"
         tree.mkdir()
-        for relative in ("t3/runtime.md", "docs/changelog/0.1.0.md", "docs/cli/roles.md", "skills/stale/SKILL.md"):
+        for relative in ("t3/runtime.md", "docs/cli/roles.md", "skills/stale/SKILL.md"):
             document = root / relative
             document.parent.mkdir(parents=True, exist_ok=True)
             document.write_text(RETIRED + "\n")

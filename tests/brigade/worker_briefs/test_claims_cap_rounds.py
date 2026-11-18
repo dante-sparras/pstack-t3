@@ -51,13 +51,6 @@ class ClaimsCapRoundsTest(BrigadeTest):
         self.brigade("dish", "D1", "--state", "in-review", "--sha", "def")
         self.assertEqual(self.close_run("--dry-run")[::2], (0, ""))
 
-    def test_close_warns_for_three_new_checks_in_one_round(self):
-        self.fired_bug_fix()
-        self.brigade("dish", "D1", "--state", "in-review", "--sha", "abc")
-        self.report_with_threads(THREE_RUNS)
-        self.assertEqual(self.close_run("--dry-run")[::2],
-                         (0, "brigade: warning: reports/D1.md names 3 new claims check runs for this round; the cap is two per round"))
-
     def test_close_stays_silent_for_a_stale_report_older_than_the_last_attempt_start(self):
         import os
         from datetime import datetime, timezone

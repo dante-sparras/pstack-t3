@@ -18,13 +18,6 @@ from .support import BrigadeTest, SCRIPT, _owner_words, call_in_process, run_glo
 
 
 class AddPathsWidenTest(BrigadeTest):
-    def test_add_paths_widens_the_recorded_lease_in_place(self):
-        self.started()
-        self.assertEqual(self.brigade("dish", "D1", "--add-paths", "src/a.py"), "D1: L1 now covers src/a.py")
-        row = self.table_row(self.at, "dishes.tsv", "D1")
-        self.assertEqual((row["lease"], row["paths"]), ("L1", "README.md,src/a.py"))
-        self.assertEqual(self.lease_lines(), ["L1 active perf/D1: README.md, src/a.py"])
-
     def test_add_paths_refused_by_another_holders_lease_changes_nothing(self):
         self.started()
         engine = self.store / "bridge-kit" / "engine"

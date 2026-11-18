@@ -428,7 +428,7 @@ def main():
     previous = meta["commit"]
     meta.update(commit=commit, version=version)
     (ROOT / "README.md").write_bytes(new_readme.encode("utf-8"))
-    UPSTREAM.write_text(json.dumps(meta, indent=2) + "\n")
+    UPSTREAM.write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(f"vendor/pstack: {previous[:12]} -> {commit[:12]} ({meta['version']})")
     if args.merge:
         apply(outcomes, build.T3)

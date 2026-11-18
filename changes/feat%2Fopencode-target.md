@@ -1,2 +1,0 @@
-- kind feature
-- `scripts/install.py` installs into OpenCode too. The `opencode` harness links each skill into `~/.config/opencode/skills`, or `$XDG_CONFIG_HOME/opencode/skills` when that is set, and into `.opencode/skills` with `--project`. `doctor` reports it like the other providers
