@@ -1,5 +1,3 @@
-Part of [the design](../multi-coordinator.md).
-
 ### Rulings
 
 The admin rules on four kinds of conflict between coordinators, on its own authority. It decides by the rules below, applied in order, and the first rule that separates the parties decides. A ruling binds the coordinators involved until it is done, expires, is superseded, or the user overrules it.
