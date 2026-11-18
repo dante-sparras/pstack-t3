@@ -134,7 +134,7 @@ def check_lock(update):
         elif not row.persona:
             current[row.lock_key] = None
     if update:
-        LOCK.write_text(json.dumps(current, indent=2, sort_keys=True) + "\n")
+        LOCK.write_text(json.dumps(current, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
         return []
     locked = json.loads(LOCK.read_text()) if LOCK.exists() else {}
     problems = []
@@ -210,7 +210,7 @@ def render(destination):
     copy_file(T3 / "setup.md", destination / "setup-pstack" / "SKILL.md")
     for skill_md in sorted(destination.glob("*/SKILL.md")):
         skill = skill_md.parent.name
-        skill_md.write_text(normalize_skill(skill_md.read_text(), skill))
+        skill_md.write_text(normalize_skill(skill_md.read_text(encoding="utf-8"), skill), encoding="utf-8", newline="\n")
 
 
 def build(destination, update_lock=False, skip_lock=False):

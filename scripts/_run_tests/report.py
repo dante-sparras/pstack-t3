@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-import collections
-from pathlib import Path
-
 from . import NO_TESTS, SEP1, SEP2
-from .events import OUTCOMES, Accounting, Ended, Ledger, Problem, Shard, Test, Verdict, exit_status, fails, kinds, plural, tallies, verdict_of
+from .events import OUTCOMES, Accounting, Ended, Ledger, Problem, Shard, Test, Verdict, exit_status, plural, tallies, verdict_of
 
 def block(kind: str, label: str, body: str) -> str:
     return f"{SEP1}\n{OUTCOMES[kind].word}: {label}\n{SEP2}\n{body}\n" if body else f"{SEP1}\n{OUTCOMES[kind].word}: {label}\n"

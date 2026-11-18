@@ -27,7 +27,7 @@ from contextlib import contextmanager
 from pathlib import Path
 
 from tests import in_process
-from tests.brigade.support import BrigadeTest, ProcessReason, SCRIPT, real_process, setUpModule
+from tests.brigade.support import BrigadeTest, ProcessReason, SCRIPT, real_process
 
 ROOT = Path(__file__).resolve().parents[1]
 RELEASE = ROOT / "scripts/release.py"

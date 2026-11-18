@@ -1,5 +1,4 @@
 import ast
-from pathlib import Path
 
 def _module_function(module, name):
     """The last `def` of `name` directly in the module body. A later rebinding by assignment, import, or a block is not seen."""

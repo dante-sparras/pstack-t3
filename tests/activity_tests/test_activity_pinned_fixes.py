@@ -20,7 +20,7 @@ from pathlib import Path
 import tests.test_activity as test_activity
 from tests.activity_tests.browser import PINNED, RENDER_TIMEOUT, TITLE, confined_run, select_browser
 from tests.activity_tests.pages import CLEAN, DATA, PROGRAM, data_of, group, item, page, row
-from tests.activity_tests.support import Fixture, worker
+from tests.activity_tests.support import worker
 
 Fixture = test_activity.Fixture
 MOD = test_activity.MOD

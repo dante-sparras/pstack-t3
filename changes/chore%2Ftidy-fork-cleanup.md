@@ -1,0 +1,5 @@
+- kind upkeep
+- A root `.gitattributes` checks out every text file with LF, and `upstream.json` is stored with LF. On a Windows checkout `scripts/build.py` no longer reports drift on every override and persona, and `scripts/check.py` no longer refuses every fragment or over-counts tokens.
+- `scripts/build.py`, `scripts/catalog.py`, and `scripts/cli_reference.py` write generated files as UTF-8 with LF, so a build on Windows writes the bytes CI generates.
+- `size-baseline.json` no longer names `t3/overrides/poteto-mode/playbooks/orchestrate.md`, which moved to `t3/added/` in the 0.15.43 sync.
+- Unused imports and shadowed bindings are gone from `scripts/_check`, `scripts/_install`, `scripts/_run_tests`, and four test modules.

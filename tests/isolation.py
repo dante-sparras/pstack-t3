@@ -180,7 +180,7 @@ def root() -> Path:
 def install() -> Path:
     """Adopt and verify the run root the pointer names, or create one when the environment names none, then
     arm the guard once and verify the environment it leaves. A repeat call verifies again from the environment."""
-    global _root, _protected
+    global _root
     if POINTER in os.environ:
         pointer = os.environ[POINTER]
         protected = _real_roots(_real(pointer) if os.path.isabs(pointer) else None, os.environ)

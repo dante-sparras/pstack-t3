@@ -188,7 +188,7 @@ def write(out=OUT, root=ROOT, tools=TOOLS):
         if stale.name not in pages:
             stale.unlink()
     for name, text in pages.items():
-        (out / name).write_text(text)
+        (out / name).write_text(text, encoding="utf-8", newline="\n")
     return out
 
 

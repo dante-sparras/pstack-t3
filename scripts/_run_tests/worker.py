@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import json
-import os
 import sys
 import unittest
 from pathlib import Path
 
 from . import ENTRY
-from .events import SETUP, STATUSES, plural
+from .events import SETUP, plural
 from .processes import follow_runner
 
 def enter(start: Path) -> None:

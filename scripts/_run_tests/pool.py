@@ -11,10 +11,10 @@ import tempfile
 import time
 from pathlib import Path
 
-from . import ACTIVE, POLL_SECONDS, PROGRESS_SECONDS
-from .events import OUTCOMES, Accounting, Channel, Ended, Interrupted, Ledger, Problem, Refusal, Running, Shard, Test, Verdict, exit_status, fails, kinds, plural
+from . import ACTIVE, PROGRESS_SECONDS
+from .events import OUTCOMES, Channel, Ended, Interrupted, Ledger, Problem, Refusal, Running, Shard, Test, Verdict, exit_status, fails, kinds, plural
 from .plan import build_shards, launch_order, read_durations, tests_in_part
-from .processes import Watch, child_env, lifeline, start_child
+from .processes import Watch, lifeline, start_child
 from .report import account, render
 
 def kill_group(proc: subprocess.Popen) -> None:

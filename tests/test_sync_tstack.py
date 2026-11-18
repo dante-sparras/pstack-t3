@@ -105,7 +105,7 @@ class SyncTstackTest(unittest.TestCase):
         before = self.files()
         code, out, err = self.run_sync(CHANGED)
         self.assertEqual((code, err), (0, ""))
-        self.assertIn(f"-steps\n+new steps\n", out)
+        self.assertIn("-steps\n+new steps\n", out)
         self.assertIn(f"{SKILLS[1]}: unchanged\n", out)
         self.assertEqual(self.files(), before)
 
